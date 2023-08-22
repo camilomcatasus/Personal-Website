@@ -2,9 +2,9 @@ use std::cell::RefCell;
 
 use actix_files as fs;
 use actix_web::http::header::ContentType;
-use actix_web::{web, App, HttpServer, HttpRequest, HttpResponse };
+use actix_web::{web, get, App, HttpServer, HttpRequest, HttpResponse };
 use minijinja::value::Value;
-use minijinja::{path_loader, Environment};
+use minijinja::{path_loader, Environment, context};
 
 thread_local! {
     static CURRENT_REQUEST: RefCell<Option<HttpRequest>> = RefCell::default()
@@ -37,6 +37,11 @@ impl AppState {
                 .body(rv)
         })
     }
+}
+
+#[get("/")]
+async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
+    return app_state.render_template("base.html", &req, context! {});
 }
 
 #[actix_web::main]
