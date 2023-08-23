@@ -39,7 +39,7 @@ impl AppState {
     }
 }
 
-#[get("/")]
+#[get("/{tail:.*}")]
 async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
     return app_state.render_template("base.html", &req, context! {});
 }
@@ -55,6 +55,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(state.clone())
             .service(fs::Files::new("/static", "./static").show_files_listing())
+            .service(page)
    })
     .bind(("127.0.0.1", 8080))?
     .run()
