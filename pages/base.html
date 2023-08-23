@@ -1,20 +1,38 @@
+{% macro toggle() %}
+	<div class="h-8 w-16 rounded-3xl border border-color border-[3px] border-rose-400 dark:border-rose-300 
+		flex justify-start dark:justify-end items-center px-0.5
+		cursor-pointer"
+		onclick="toggle(this);">
+		<div class="h-[1.5rem] w-[1.5rem] rounded-3xl bg-rose-400 dark:bg-rose-300" >
+		</div>
+	</div>
+{% endmacro %}
 <!doctype html>
 <html class="dark">
 <head >
-	<title>{% block title %}{% endblock %}</title>
+	<title>Cambucha</title>
 	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
-	<style>
-		* {
-		}
-	</style>
 	<script src="/static/htmx.min.js"></script>
 	<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+	<script>
+		function toggle(sender) {
+			let documentClass = document.documentElement.classList;
+			if(documentClass.value == "dark")
+				documentClass.remove("dark");
+			else
+				documentClass.add("dark");
+
+		}
+	</script>
 </head>
-<body class="w-screen h-screen flex flex-col overflow-x-hidden relative">
+<body class="w-screen h-screen flex flex-col overflow-x-hidden relative bg-white dark:bg-slate-800">
 	<div class="relative w-full h-full overflow-y-auto ">
-		<div class="absolute top-0 right-0 h-20 w-20">
-				
+		<div class="absolute top-0 right-0 h-20 w-20 pt-4 pr-4">
+			{{ toggle() }}
 		</div>
 	</div>
 </body>
 </html>
+
+
+
