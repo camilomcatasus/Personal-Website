@@ -38,12 +38,44 @@
 				documentClass.add("dark");
 		}
 
-		function displayText(sender) {
-			let text = sender.value;
+		function displayText(sender, sentText) {
+			var text = sentText;
+			console.log(text);
+			var index = 1;
 			var consoleTyper = setInterval(function() {
-
+				sender.innerHTML = text.substring(0, index);
+				if(text.length <= index)
+				{
+					sender.classList.add("opacity-0");
+					sender.addEventListener('transitionend', () => handleTransitionEnd(sender));
+					clearInterval(consoleTyper);
+					return;
+				}
+				index += 1;
 			}, 50);
 		}
+
+		function handleTransitionEnd(sender) {
+			console.log(sender, sender.style.opacity);
+			let firstComputedStatus = window.getComputedStyle(sender);
+			if (firstComputedStatus.getPropertyValue("opacity") == 0) {
+				setTimeout(() => {
+					let currentComputedStatus = window.getComputedStyle(sender);
+					if(currentComputedStatus.getPropertyValue("opacity") == 0) {
+						sender.remove();
+					}
+				}, 1000);
+			}
+		}
+
+		window.onload = () => {
+			let t1 = document.getElementById("t1");
+			let t2 = document.getElementById("t2");
+			console.log(t1, t2);
+			displayText(t1, "Hello, world!");
+			displayText(t2, "Lorem Ipsum");
+		}
+
 	</script>
 </head>
 <body class="w-screen h-screen flex flex-col overflow-x-hidden relative transition-colors bg-white dark:bg-slate-800">
@@ -51,12 +83,14 @@
 		<div class="absolute top-0 right-0 h-32 w-32 pt-4 pr-4">
 			{{ toggle() }}
 		</div>
-		<div class="h-screen w-full justify-center items-center flex ">
+		<div class="h-screen w-full justify-center items-center flex relative">
 				<h1 class="dark:text-white text-7xl" id="welcome-text">
 					I'm Camilo,
 					</br>
 					Welcome to my website...
 				</h1>
+				<div id="t1" class="absolute top-8 left-8 dark:text-white transition-opacity duration-[4000ms] hover:opacity-100" ></div>
+				<div id="t2" class="absolute bottom-8 right-68 dark:text-white transition-opacity duration-[4000ms] hover:opacity-100" ></div>
 		</div>
 	</div>
 </body>
