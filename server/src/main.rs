@@ -35,7 +35,7 @@ impl AppState {
             let tmpl = self.env.get_template(name).unwrap();
             let rv = tmpl.render(ctx).unwrap();
             HttpResponse::Ok()
-                .content_type(ContentType::html())
+                .content_type(ContentType ::html())
                 .body(rv)
         })
     }
@@ -57,7 +57,7 @@ async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
 async fn main() -> std::io::Result<()> {
 
     let test: endpoints::AirQuality = reqwest::get("https://api.api-ninjas.com/v1/airquality?city=Miami").await.unwrap().json().await.unwrap();
-    println!("{}", test);
+    println!("{}", test.);
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
     let state = web::Data::new(AppState { env });
