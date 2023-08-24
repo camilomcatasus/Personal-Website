@@ -1,3 +1,5 @@
+mod endpoints;
+
 use std::cell::RefCell;
 
 use actix_files as fs;
@@ -39,6 +41,13 @@ impl AppState {
     }
 }
 
+
+#[get("/api/blurb")]
+async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
+    
+    return app_state.render_template("blurb.html", &req, context! {});
+}
+
 #[get("/{tail:.*}")]
 async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
     return app_state.render_template("base.html", &req, context! {});
@@ -46,7 +55,9 @@ async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    
+
+    let test: endpoints::AirQuality = reqwest::get("https://api.api-ninjas.com/v1/airquality?city=Miami").await.unwrap().json().await.unwrap();
+    println!("{}", test);
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
     let state = web::Data::new(AppState { env });
