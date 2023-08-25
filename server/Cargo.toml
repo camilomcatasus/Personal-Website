@@ -21,3 +21,4 @@ minijinja = {version = "1.0.5", features = ["loader"]}
 rusqlite = "0.29.0"
 anyhow = "1.0.75"
 reqwest = {version = "0.11.20", features = ["json"]}
+serde_json = "1.0.105"

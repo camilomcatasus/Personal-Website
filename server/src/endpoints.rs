@@ -5,16 +5,20 @@ pub struct Request {
     format_str: String,
 }
 
+pub enum RequestObject {
+    AirQualityRequest(AirQuality),
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct AirQuality {
     overall_aqi: usize,
     CO: AirQualityField,
     PM10: AirQualityField,
     SO2: AirQualityField,
-    #[serde(rename(serialize = "PM2.5"))]
+    #[serde(rename(deserialize = "PM2.5"))]
     PM2p5: AirQualityField,
 }
-
+ 
 #[derive(Serialize, Deserialize)]
 pub struct AirQualityField {
     concentration: f64,
