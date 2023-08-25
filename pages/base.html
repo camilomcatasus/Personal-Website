@@ -1,6 +1,6 @@
 {% macro toggle() %}
 	<div class="h-12 w-24 rounded-3xl border border-color border-[3px] transition-colors border-rose-400 dark:border-rose-300 
-		flex items-center px-1
+		flex items-center px-1 z-50
 		cursor-pointer relative"
 		onclick="toggle(this);">
 		<div class="h-[2rem] w-[2rem] rounded-3xl bg-rose-400 dark:bg-rose-300
@@ -31,6 +31,7 @@
 	<script src="https://kit.fontawesome.com/6cf318b276.js" crossorigin="anonymous"></script>
 	<script>
 		function toggle(sender) {
+			console.log("hello");
 			let documentClass = document.documentElement.classList;
 			if(documentClass.value == "dark")
 				documentClass.remove("dark");
@@ -39,7 +40,11 @@
 		}
 
 		function displayText(sender, sentText) {
-			var text = sentText;
+			var text = sender.getAttribute("api-text");
+			if (!text)
+			{
+				text = sentText;
+			}
 			console.log(text);
 			var index = 1;
 			var consoleTyper = setInterval(function() {

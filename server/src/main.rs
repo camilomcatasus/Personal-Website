@@ -1,5 +1,4 @@
 mod endpoints;
-
 use std::cell::RefCell;
 
 use actix_files as fs;
@@ -56,11 +55,6 @@ async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
-    let client = reqwest::Client::new();
-    let test: endpoints::AirQuality = client.get("https://api.api-ninjas.com/v1/airquality?city=Miami")
-        .header("X-Api-Key", "+YpXO1scLmPgxhNVHfUR3w==WaF0TYbFWSqXrCTU")
-        .send().await.unwrap().json().await.unwrap();
-    println!("{}", serde_json::to_string(&test).unwrap());
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
     let state = web::Data::new(AppState { env });

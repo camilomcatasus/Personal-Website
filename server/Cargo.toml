@@ -22,3 +22,5 @@ rusqlite = "0.29.0"
 anyhow = "1.0.75"
 reqwest = {version = "0.11.20", features = ["json"]}
 serde_json = "1.0.105"
+enum_macros = { path = "../enum_macros" }
+rand = "0.8.5"
