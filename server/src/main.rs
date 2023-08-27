@@ -1,6 +1,7 @@
 mod endpoints;
 use std::cell::RefCell;
 
+use endpoints::{getApiText, RequestObject};
 use actix_files as fs;
 use actix_web::http::header::ContentType;
 use actix_web::{web, get, App, HttpServer, HttpRequest, HttpResponse };
@@ -54,6 +55,11 @@ async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    let air_quality = endpoints::getApiText(Some(&RequestObject::LeagueRankRequest)).await;
+//let my_anime = getApiText(Some(&RequestObject::LastAnimeRequest)).await;
+    println!("{}", serde_json::to_string(&air_quality.unwrap()).unwrap());
+    //println!("{}", serde_json::to_string(&my_anime.unwrap()).unwrap());
 
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));

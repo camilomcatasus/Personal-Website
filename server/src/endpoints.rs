@@ -1,4 +1,5 @@
 mod environment;
+use anyhow::Context;
 use serde::{Serialize, Deserialize};
 use enum_macros::EnumArray;
 use rand::seq::SliceRandom;
@@ -15,7 +16,8 @@ pub struct ResponseObject {
 pub enum RequestObject {
     AirQualityRequest,
     LastAnimeRequest,
-    AnimeStatsRequest,
+    LeagueRankRequest,
+    //AnimeStatsRequest,
     
 }
 
@@ -50,22 +52,31 @@ pub async fn getApiText( debug_option: Option<&RequestObject>) -> anyhow::Result
             new_url = String::from("https://api-ninjas.com/api/airquality");
         },
         RequestObject::LastAnimeRequest => {
-            let response: MalResponse = client.get("https://api.myanimelist.net/v2/users/@me/animelist?sort=list_updated_at&status=completed")
+            let response: MalResponse = client.get("https://api.myanimelist.net/v2/users/unkownfire25/animelist?sort=list_updated_at&status=completed")
                 .header("X-MAL-CLIENT-ID", environment::MAL_API_KEY)
                 .send().await?
                 .json().await?;
 
             let last_daum = response.data[0].node.clone();
 
-            new_inner_text = format!("The last anime I watched was <a href={} target='_blank' >{}<a>", last_daum.id, last_daum.title);
+            new_inner_text = format!("The last anime I watched was <a href='https://myanimelist.net/anime/{}' target='_blank' >{}<a>", last_daum.id, last_daum.title);
             new_help_text = Some(format!("The information here is derived from my MyAnimeList profile and might not be completely accurate"));
-            new_url = format!("");
+            new_url = format!("https://myanimelist.net/apiconfig/references/api/v2#operation/users_user_id_animelist_get");
         },
-        RequestObject::AnimeStatsRequest => {
-            new_inner_text = format!("Camilo is currently watching {} anime", "");
+        RequestObject::LeagueRankRequest => {
+            let response: Vec<LeagueRankResponse> = client.get("https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/cbOutPi9615Fn8WgciJfCwBv5A72Fuheo5zAFcIaGec2jI4")
+                .header("X-Riot-Token", "RGAPI-10ef8ace-74e5-4924-90a6-c3fc79e11b86")
+                .send().await?
+                .json().await?;
+
+            let ranked_flex_response = response.iter().find( |e| e.queue_type == "RANKED_FLEX_SR").context("Ranked Flex not found")?;
+            let rank = ranked_flex_response.rank.clone().context("Rank not found in response")?;
+            let tier = ranked_flex_response.tier.clone().context("Tier not found in response")?;
+
+            new_inner_text = format!("My current flex rank in League of Legends is {} {}", tier, rank);
             new_help_text = None;
-            new_url = format!("");
-        },
+            new_url = String::from("https://developer.riotgames.com/apis#league-v4/GET_getLeagueEntriesForSummoner");
+        }
     }
 
     return Ok(ResponseObject {
@@ -77,12 +88,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>) -> anyhow::Result
 
 #[derive(Serialize, Deserialize)]
 pub struct AirQuality {
-    overall_aqi: usize,
-    CO: AirQualityField,
-    PM10: AirQualityField,
-    SO2: AirQualityField,
-    #[serde(rename(deserialize = "PM2.5"))]
-    PM2p5: AirQualityField,
+    overall_aqi: usize
 }
  
 #[derive(Serialize, Deserialize)]
@@ -99,7 +105,6 @@ pub struct MalResponse {
 #[derive(Serialize, Deserialize)]
 pub struct MalDaum {
     pub node: MalNode,
-    pub list_status: MalListStatus,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -123,4 +128,22 @@ pub struct MalListStatus {
     pub is_rewatching: bool,
     pub updated_at: String,
     pub num_episodes_watched: Option<i64>,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct LeagueRankResponse {
+    pub league_id: Option<String>,
+    pub queue_type: String,
+    pub tier: Option<String>,
+    pub rank: Option<String>,
+    pub summoner_id: String,
+    pub summoner_name: String,
+    pub league_points: u64,
+    pub wins: u64,
+    pub losses: u64,
+    pub veteran: bool,
+    pub inactive: bool,
+    pub fresh_blood: bool,
+    pub hot_streak: bool
 }
