@@ -44,8 +44,20 @@ impl AppState {
 
 #[get("/api/blurb")]
 async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    
-    return app_state.render_template("blurb.html", &req, context! {});
+    let random_response_result: Result<endpoints::ResponseObject, anyhow::Error> = endpoints::getApiText(None).await;
+    match random_response_result {
+        Ok(random_response) => {
+            return app_state.render_template("blurb.html", &req, context! {
+                inner_text => random_response.inner_text,
+                url => random_response.url,
+                hidden_text => random_response.help_text
+            });
+        },
+        Err(err) => {
+            println!("{}", err);
+            return HttpResponse::InternalServerError().finish();
+        }
+    }
 }
 
 #[get("/{tail:.*}")]

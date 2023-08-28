@@ -1,4 +1,3 @@
-mod environment;
 use anyhow::Context;
 use serde::{Serialize, Deserialize};
 use enum_macros::EnumArray;
