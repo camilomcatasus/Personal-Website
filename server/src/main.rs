@@ -42,8 +42,27 @@ impl AppState {
 }
 
 
-#[get("/api/blurb")]
+#[get("/api/blurb/{blocking_start_x}/{blocking_start_y}/{blocking_end_x}/{blocking_end_y}/{screen_x}/{screen_y}")]
 async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
+
+    let random_x = rand::random::<f64>();
+    let random_y = rand::random::<f64>();
+    let point_x: u32;
+    let point_y: u32;
+    let query_params_result: Result<(u32,u32, u32, u32, u32, u32), _> = req.match_info().load();
+    match query_params_result {
+        Ok(param_tuple) => {
+            point_x = 0;
+            point_y = 0;
+        }
+        Err(err) => {
+            return app_state.render_template("error_blurb.html", &req, context! {
+                inner_text => "An error occurred while making the API request",
+                hidden_text => format!("Error Message: {}", err)
+            });
+        }
+    }
+
     let random_response_result: Result<endpoints::ResponseObject, anyhow::Error> = endpoints::getApiText(None).await;
     match random_response_result {
         Ok(random_response) => {
@@ -54,8 +73,10 @@ async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse
             });
         },
         Err(err) => {
-            println!("{}", err);
-            return HttpResponse::InternalServerError().finish();
+            return app_state.render_template("error_blurb.html", &req, context! {
+                inner_text => "An error occurred while making the API request",
+                hidden_text => format!("Error Message: {}", err)
+            });
         }
     }
 }
