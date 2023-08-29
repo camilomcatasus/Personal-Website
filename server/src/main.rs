@@ -7,6 +7,7 @@ use actix_web::http::header::ContentType;
 use actix_web::{web, get, App, HttpServer, HttpRequest, HttpResponse };
 use minijinja::value::Value;
 use minijinja::{path_loader, Environment, context};
+use rand::Rng;
 
 thread_local! {
     static CURRENT_REQUEST: RefCell<Option<HttpRequest>> = RefCell::default()
@@ -41,22 +42,51 @@ impl AppState {
     }
 }
 
+fn get_area(rect: (i32, i32, i32, i32)) -> f64 {
+    return f64::from((rect.2 - rect.0) * (rect.3 - rect.1));
+}
 
 #[get("/api/blurb/{blocking_start_x}/{blocking_start_y}/{blocking_end_x}/{blocking_end_y}/{screen_x}/{screen_y}")]
 async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
 
-    let random_x = rand::random::<f64>();
-    let random_y = rand::random::<f64>();
-    let point_x: u32;
-    let point_y: u32;
-    let query_params_result: Result<(u32,u32, u32, u32, u32, u32), _> = req.match_info().load();
+    
+    let point_x: i32;
+    let point_y: i32;
+
+    let query_params_result: Result<(i32,i32, i32, i32, i32, i32), _> = req.match_info().load();
     match query_params_result {
         Ok(param_tuple) => {
-            point_x = 0;
-            point_y = 0;
+            let random_rect = rand::random::<f64>();
+
+            let (blocking_start_x, blocking_start_y, blocking_end_x, blocking_end_y, screen_x, screen_y) = param_tuple;
+
+            let left_rect: (i32, i32, i32, i32) = (0, 0, blocking_start_x, screen_y);
+            let right_rect: (i32, i32, i32, i32) = (blocking_end_x, 0, screen_x, screen_y);
+            let bot_rect: (i32, i32, i32, i32) = (blocking_start_x, 0, blocking_end_x, blocking_start_y);
+            let top_rect: (i32, i32, i32, i32) = (blocking_start_x, blocking_end_y, blocking_end_x, screen_y);
+            
+            let total_area: f64 = get_area(left_rect) + get_area(right_rect) + get_area(bot_rect) + get_area(top_rect);
+            let selected_rect: (i32, i32, i32, i32);
+
+            if random_rect <= get_area(left_rect) / total_area {
+                selected_rect = left_rect;
+            }
+            else if random_rect <= get_area(right_rect) / total_area {
+                selected_rect = right_rect;
+            }
+            else if random_rect <= get_area(bot_rect) / total_area {
+                selected_rect = bot_rect;
+            }
+            else {
+                selected_rect = top_rect;
+            }
+            point_x = rand::thread_rng().gen_range(selected_rect.0..selected_rect.2);
+            point_y = rand::thread_rng().gen_range(selected_rect.1..selected_rect.3);
         }
         Err(err) => {
             return app_state.render_template("error_blurb.html", &req, context! {
+                x => 0,
+                y => 0,
                 inner_text => "An error occurred while making the API request",
                 hidden_text => format!("Error Message: {}", err)
             });
@@ -67,6 +97,8 @@ async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse
     match random_response_result {
         Ok(random_response) => {
             return app_state.render_template("blurb.html", &req, context! {
+                x => point_x,
+                y => point_y,
                 inner_text => random_response.inner_text,
                 url => random_response.url,
                 hidden_text => random_response.help_text
@@ -74,6 +106,8 @@ async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse
         },
         Err(err) => {
             return app_state.render_template("error_blurb.html", &req, context! {
+                x => point_x,
+                y => point_y,
                 inner_text => "An error occurred while making the API request",
                 hidden_text => format!("Error Message: {}", err)
             });
