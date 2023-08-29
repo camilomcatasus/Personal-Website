@@ -2,17 +2,22 @@ use anyhow::Context;
 use serde::{Serialize, Deserialize};
 use enum_macros::EnumArray;
 use rand::seq::SliceRandom;
-
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
 mod environment;
 
-#[derive(Serialize, Deserialize)]
+
+pub const MINUTE: u64 = 60;
+pub const HOUR: u64 = 3600;
+
+#[derive(Serialize, Deserialize, Clone)]
 pub struct ResponseObject {
     pub inner_text: String,
     pub help_text: Option<String>,
     pub url: String
 }
 
-#[derive(EnumArray)]
+#[derive(EnumArray, PartialEq, Eq, Hash)]
 pub enum RequestObject {
     AirQualityRequest,
     LastAnimeRequest,
@@ -20,18 +25,42 @@ pub enum RequestObject {
     //AnimeStatsRequest,
 }
 
-pub async fn getApiText( debug_option: Option<&RequestObject>) -> anyhow::Result<ResponseObject> {
+#[derive(Clone)]
+pub struct CacheObject {
+    last_get_time: Instant,
+    keep_alive: Duration,
+    last_response: ResponseObject
+}
+
+pub async fn getApiText( debug_option: Option<&RequestObject>, 
+                        request_cache: HashMap<RequestObject, CacheObject>) -> anyhow::Result<ResponseObject> {
     
     let choice: &RequestObject;
     match debug_option {
         Some(requested_object) => choice = requested_object,
         None => choice = RequestObject::VARIANTS.choose(&mut rand::thread_rng()).unwrap()
     }
+
+    // Check to see if the key exists in the cache
+    let in_cache = request_cache.get(choice);
     
+    match in_cache {
+        Some(cache_object) => {
+            let elapsed: Duration = cache_object.last_get_time.elapsed();
+            if elapsed.le(&cache_object.keep_alive) {
+                return Ok(cache_object.last_response.clone());
+            }
+        },
+        None => {
+        }
+    }
+
     let new_inner_text: String;
     let new_help_text: Option<String>;
     let new_url: String;
     let client = reqwest::Client::new();
+    let now = Instant::now();
+    let response_keep_alive: Duration;
 
     match *choice {
         RequestObject::AirQualityRequest => {
@@ -49,6 +78,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>) -> anyhow::Result
                                     "<li class='text-indigo-600'>Very Unhealthy: 201 to 300</li>",
                                     "<li class='text-rose-700'>Hazardous: 301 and higher</li>"));
             new_url = String::from("https://api-ninjas.com/api/airquality");
+            response_keep_alive = Duration::new(MINUTE * 30, 0);
         },
         RequestObject::LastAnimeRequest => {
             let response: MalResponse = client.get("https://api.myanimelist.net/v2/users/unkownfire25/animelist?sort=list_updated_at&status=completed")
@@ -61,6 +91,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>) -> anyhow::Result
             new_inner_text = format!("The last anime I watched was <a href='https://myanimelist.net/anime/{}' target='_blank' >{}<a>", last_daum.id, last_daum.title);
             new_help_text = Some(format!("The information here is derived from my MyAnimeList profile and might not be completely accurate"));
             new_url = format!("https://myanimelist.net/apiconfig/references/api/v2#operation/users_user_id_animelist_get");
+            response_keep_alive = Duration::new(HOUR * 12, 0);
         },
         RequestObject::LeagueRankRequest => {
             let response: Vec<LeagueRankResponse> = client.get("https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/cbOutPi9615Fn8WgciJfCwBv5A72Fuheo5zAFcIaGec2jI4")
@@ -75,14 +106,23 @@ pub async fn getApiText( debug_option: Option<&RequestObject>) -> anyhow::Result
             new_inner_text = format!("I am currently rank {} {} in League of Legends", tier, rank);
             new_help_text = None;
             new_url = String::from("https://developer.riotgames.com/apis#league-v4/GET_getLeagueEntriesForSummoner");
+            response_keep_alive = Duration::new(HOUR, 0);
         },
     }
 
-    return Ok(ResponseObject {
+    let final_response = ResponseObject {
         inner_text: new_inner_text,
         help_text: new_help_text,
         url: new_url
-    })
+    };
+
+    let final_cache = CacheObject {
+        last_get_time: now,
+        keep_alive: response_keep_alive,
+        last_response: final_response.clone()
+    };
+
+    return Ok(final_response);
 }
 
 #[derive(Serialize, Deserialize)]

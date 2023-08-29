@@ -1,5 +1,6 @@
 mod endpoints;
 use std::cell::RefCell;
+use std::time::{Instant, Duration};
 
 use endpoints::{getApiText, RequestObject};
 use actix_files as fs;
@@ -8,6 +9,7 @@ use actix_web::{web, get, App, HttpServer, HttpRequest, HttpResponse };
 use minijinja::value::Value;
 use minijinja::{path_loader, Environment, context};
 use rand::Rng;
+use std::collections::HashMap;
 
 thread_local! {
     static CURRENT_REQUEST: RefCell<Option<HttpRequest>> = RefCell::default()
@@ -28,6 +30,7 @@ where
 
 pub struct AppState {
     env: minijinja::Environment<'static>,
+    request_cache: HashMap<endpoints::RequestObject, endpoints::CacheObject>,
 }
 
 impl AppState {
@@ -48,7 +51,6 @@ fn get_area(rect: (i32, i32, i32, i32)) -> f64 {
 
 #[get("/api/blurb/{blocking_start_x}/{blocking_start_y}/{blocking_end_x}/{blocking_end_y}/{screen_x}/{screen_y}")]
 async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-
     
     let point_x: i32;
     let point_y: i32;
@@ -93,7 +95,7 @@ async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse
         }
     }
 
-    let random_response_result: Result<endpoints::ResponseObject, anyhow::Error> = endpoints::getApiText(None).await;
+    let random_response_result: Result<endpoints::ResponseObject, anyhow::Error> = endpoints::getApiText(None, &app_state.request_cache).await;
     match random_response_result {
         Ok(random_response) => {
             return app_state.render_template("blurb.html", &req, context! {
@@ -123,14 +125,11 @@ async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
-    let air_quality = endpoints::getApiText(Some(&RequestObject::LeagueRankRequest)).await;
-//let my_anime = getApiText(Some(&RequestObject::LastAnimeRequest)).await;
-    println!("{}", serde_json::to_string(&air_quality.unwrap()).unwrap());
-    //println!("{}", serde_json::to_string(&my_anime.unwrap()).unwrap());
 
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
-    let state = web::Data::new(AppState { env });
+    let mut request_cache: HashMap<endpoints::RequestObject, (Instant, Duration)> = HashMap::new();
+    let state = web::Data::new(AppState { env, request_cache });
 
     HttpServer::new(move || {
         App::new()
