@@ -33,7 +33,7 @@ pub struct CacheObject {
 }
 
 pub async fn getApiText( debug_option: Option<&RequestObject>, 
-                        request_cache: HashMap<RequestObject, CacheObject>) -> anyhow::Result<ResponseObject> {
+                        request_cache: &HashMap<RequestObject, CacheObject>) -> anyhow::Result<ResponseObject> {
     
     let choice: &RequestObject;
     match debug_option {

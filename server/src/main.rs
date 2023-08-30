@@ -1,8 +1,6 @@
 mod endpoints;
 use std::cell::RefCell;
-use std::time::{Instant, Duration};
-
-use endpoints::{getApiText, RequestObject};
+use endpoints::{getApiText, RequestObject, CacheObject, ResponseObject};
 use actix_files as fs;
 use actix_web::http::header::ContentType;
 use actix_web::{web, get, App, HttpServer, HttpRequest, HttpResponse };
@@ -30,7 +28,7 @@ where
 
 pub struct AppState {
     env: minijinja::Environment<'static>,
-    request_cache: HashMap<endpoints::RequestObject, endpoints::CacheObject>,
+    request_cache: HashMap<RequestObject, CacheObject>,
 }
 
 impl AppState {
@@ -95,7 +93,7 @@ async fn blurb(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse
         }
     }
 
-    let random_response_result: Result<endpoints::ResponseObject, anyhow::Error> = endpoints::getApiText(None, &app_state.request_cache).await;
+    let random_response_result: Result<ResponseObject, anyhow::Error> = getApiText(None, &app_state.request_cache).await;
     match random_response_result {
         Ok(random_response) => {
             return app_state.render_template("blurb.html", &req, context! {
@@ -128,7 +126,7 @@ async fn main() -> std::io::Result<()> {
 
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
-    let mut request_cache: HashMap<endpoints::RequestObject, (Instant, Duration)> = HashMap::new();
+    let request_cache: HashMap<RequestObject, CacheObject> = HashMap::new();
     let state = web::Data::new(AppState { env, request_cache });
 
     HttpServer::new(move || {
