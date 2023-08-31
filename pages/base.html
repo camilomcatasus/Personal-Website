@@ -31,7 +31,6 @@
 	<script src="https://kit.fontawesome.com/6cf318b276.js" crossorigin="anonymous"></script>
 	<script>
 		function toggle(sender) {
-			console.log("hello");
 			let documentClass = document.documentElement.classList;
 			if(documentClass.value == "dark")
 				documentClass.remove("dark");
@@ -45,7 +44,6 @@
 			{
 				text = sentText;
 			}
-			console.log(text);
 			var index = 1;
 			var consoleTyper = setInterval(function() {
 				sender.innerHTML = text.substring(0, index);
@@ -61,7 +59,6 @@
 		}
 
 		function handleTransitionEnd(sender) {
-			console.log(sender, sender.style.opacity);
 			let firstComputedStatus = window.getComputedStyle(sender);
 			if (firstComputedStatus.getPropertyValue("opacity") == 0) {
 				setTimeout(() => {
@@ -73,12 +70,19 @@
 			}
 		}
 
-		window.onload = () => {
+        function generateCoords() {
+            let boundingWidth = screen.width - 100;
+            let boundingHeight = screen.height - 100;
+        }
+
+	    window.onload = () => {
 			let t1 = document.getElementById("t1");
 			let t2 = document.getElementById("t2");
-			console.log(t1, t2);
+
 			displayText(t1, "Hello, world!");
 			displayText(t2, "Lorem Ipsum");
+
+            generateCoords();
 		}
 
 	</script>
