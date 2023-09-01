@@ -101,7 +101,8 @@
 				</h1>
 				<div id="t1" class="absolute top-8 left-8 dark:text-white transition-opacity duration-[4000ms] hover:opacity-100" ></div>
 				<div id="t2" class="absolute bottom-8 right-68 dark:text-white transition-opacity duration-[4000ms] hover:opacity-100" ></div>
-                <div class="grid inset=0 p-8 grid-auto-cols-[250px] grid-auto-rows-[100px]">
+                <div class="grid inset=0 p-8 grid-auto-cols-[250px] grid-auto-rows-[100px]"
+                    hx-vals="js:{displayed: getRects(), screen_height: getDivHeight(), screen_width: getDivWidth()}">
                 </div>
 		</div>
 	</div>

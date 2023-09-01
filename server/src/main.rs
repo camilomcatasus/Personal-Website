@@ -48,7 +48,7 @@ impl AppState {
 struct BlurbRequestData {
     screen_w: usize,
     screen_h: usize,
-    selected_rects: Vec<RectPos>
+    displayed_rects: Vec<RectPos>
 }
 
 #[derive(Serialize, Deserialize)]
@@ -80,7 +80,7 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
         }
     }
 
-    req_data.selected_rects.iter().for_each( |rect_pos| {
+    req_data.displayed_rects.iter().for_each( |rect_pos| {
         match positions.get_mut(rect_pos.col + rect_pos.row * col_total) {
             Some(rect_ref) => {
                 rect_ref.deletion_flag = true;
