@@ -1,6 +1,7 @@
-<div class="absolute dark:text-white transition-opacity duration-[4000ms] hover:opacity-100 group w-[150px] max-h-[150px]" 
+<div class="dark:text-white transition-opacity duration-[4000ms] hover:opacity-100 group w-[250px] max-h-[100px] grid-item" 
     api-text="{{ inner_text }}"
-    style="top: {{ y }}px; left: {{ x }}px">
+    style="grid-row: {{ y }}; grid-column: {{ x }};"
+    x="{{x}}" y="{{y}}">
 	<div class="absolute top-full hidden group-hover:block border-2 rounded dark:text-white flex flex-col">
         {{ help_text }}
 		<div>

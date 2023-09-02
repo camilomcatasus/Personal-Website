@@ -70,21 +70,38 @@
 			}
 		}
 
-        function generateCoords() {
-            let boundingWidth = screen.width - 100;
-            let boundingHeight = screen.height - 100;
+        function getGridHeight() {
+            return document.getElementById('landing-page-grid').clientHeight;
         }
 
-	    window.onload = () => {
-			let t1 = document.getElementById("t1");
-			let t2 = document.getElementById("t2");
+        function getGridWidth() {
+            return document.getElementById('landing-page-grid').clientWidth;
+        }
 
-			displayText(t1, "Hello, world!");
-			displayText(t2, "Lorem Ipsum");
+        function getRects() {
+            let grid = document.getElementById('landing-page-grid');
+            let childRects = grid.children;
+            let rectList = [];
+            for (let childRect of childRects) {
+                let col = parseInt(childRect.getAttribute("x"));
+                let row = parseInt(childRect.getAttribute("y"));
+                
+                if(col && row ) {
+                    console.log(col, row);
+                    rectList.push({
+                        "col": col,
+                        "row": row
+                    });
+                }
+            }
+            return rectList;
+        }
 
-            generateCoords();
-		}
-
+        htmx.onLoad((elt) => {
+            if(elt.getAttribute("api-text")) {
+                displayText(elt);
+            }
+        });
 	</script>
 </head>
 <body class="w-screen h-screen flex flex-col overflow-x-hidden relative transition-colors bg-white dark:bg-slate-800">
@@ -99,10 +116,12 @@
 					</br>
 					Welcome to my website...
 				</h1>
-				<div id="t1" class="absolute top-8 left-8 dark:text-white transition-opacity duration-[4000ms] hover:opacity-100" ></div>
-				<div id="t2" class="absolute bottom-8 right-68 dark:text-white transition-opacity duration-[4000ms] hover:opacity-100" ></div>
-                <div class="grid inset=0 p-8 grid-auto-cols-[250px] grid-auto-rows-[100px]"
-                    hx-vals="js:{displayed: getRects(), screen_height: getDivHeight(), screen_width: getDivWidth()}">
+                <div id="landing-page-grid" class="absolute grid inset-0 p-8 auto-cols-[250px] auto-rows-[100px]"
+                    hx-post="/api/blurb"
+                    hx-trigger="every 2s"
+                    hx-swap="beforeend"
+                    hx-vals="js:{displayed_rects: getRects(), grid_h: getGridHeight(), grid_w: getGridWidth()}"
+                    hx-ext="json-enc">
                 </div>
 		</div>
 	</div>

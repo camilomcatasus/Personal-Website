@@ -3,6 +3,7 @@ use serde::{Serialize, Deserialize};
 use enum_macros::EnumArray;
 use rand::seq::SliceRandom;
 use std::collections::HashMap;
+use std::sync::Mutex;
 use std::time::{Duration, Instant};
 mod environment;
 
@@ -17,7 +18,7 @@ pub struct ResponseObject {
     pub url: String
 }
 
-#[derive(EnumArray, PartialEq, Eq, Hash)]
+#[derive(EnumArray, PartialEq, Eq, Hash, Debug, Copy, Clone)]
 pub enum RequestObject {
     AirQualityRequest,
     LastAnimeRequest,
@@ -33,16 +34,15 @@ pub struct CacheObject {
 }
 
 pub async fn getApiText( debug_option: Option<&RequestObject>, 
-                        request_cache: &HashMap<RequestObject, CacheObject>) -> anyhow::Result<ResponseObject> {
+                        request_cache: &mut HashMap<RequestObject, CacheObject>) -> anyhow::Result<ResponseObject> {
     
     let choice: &RequestObject;
     match debug_option {
         Some(requested_object) => choice = requested_object,
         None => choice = RequestObject::VARIANTS.choose(&mut rand::thread_rng()).unwrap()
     }
-
     // Check to see if the key exists in the cache
-    let in_cache = request_cache.get(choice);
+    let in_cache = request_cache.get(choice).clone();
     
     match in_cache {
         Some(cache_object) => {
@@ -52,6 +52,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
             }
         },
         None => {
+            println!("Didn't find object in cache for {:?}", choice);
         }
     }
 
@@ -121,6 +122,8 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
         keep_alive: response_keep_alive,
         last_response: final_response.clone()
     };
+
+    request_cache.insert(*choice, final_cache);
 
     return Ok(final_response);
 }

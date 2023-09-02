@@ -1,4 +1,5 @@
 mod endpoints;
+use std::sync::Mutex;
 use std::cell::RefCell;
 use endpoints::{getApiText, RequestObject, CacheObject, ResponseObject};
 use actix_files as fs;
@@ -29,7 +30,7 @@ where
 
 pub struct AppState {
     env: minijinja::Environment<'static>,
-    request_cache: HashMap<RequestObject, CacheObject>,
+    request_cache: Mutex<HashMap<RequestObject, CacheObject>>,
 }
 
 impl AppState {
@@ -46,8 +47,8 @@ impl AppState {
 
 #[derive(Serialize, Deserialize)]
 struct BlurbRequestData {
-    screen_w: usize,
-    screen_h: usize,
+    grid_w: usize,
+    grid_h: usize,
     displayed_rects: Vec<RectPos>
 }
 
@@ -65,8 +66,8 @@ const BLURB_HEIGHT: usize = 100;
 #[post("/api/blurb")]
 async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestData>, req: HttpRequest) -> HttpResponse {
     
-    let col_total: usize = req_data.screen_w / BLURB_WIDTH;
-    let row_total: usize = req_data.screen_h / BLURB_HEIGHT;
+    let col_total: usize = req_data.grid_w / BLURB_WIDTH;
+    let row_total: usize = req_data.grid_h / BLURB_HEIGHT;
 
     let mut positions: Vec<RectPos> = Vec::new();
     
@@ -100,11 +101,14 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
     let mut rng = rand::thread_rng();
     let choice = positions.choose(&mut rng).unwrap();
     println!("RECT SELECTED | X: {}, Y{}", choice.col, choice.row);
-
-    let random_response_result: Result<ResponseObject, anyhow::Error> = getApiText(None, &app_state.request_cache).await;
+    
+    let mut cache = app_state.request_cache.lock().unwrap();
+    let random_response_result: Result<ResponseObject, anyhow::Error> = getApiText(None, &mut cache).await;
     match random_response_result {
         Ok(random_response) => {
             return app_state.render_template("blurb.html", &req, context! {
+                x => choice.col,
+                y => choice.row,
                 inner_text => random_response.inner_text,
                 url => random_response.url,
                 hidden_text => random_response.help_text
@@ -112,6 +116,8 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
         },
         Err(err) => {
             return app_state.render_template("error_blurb.html", &req, context! {
+                x => choice.col,
+                y => choice.row,
                 inner_text => "An error occurred while making the API request",
                 hidden_text => format!("Error Message: {}", err)
             });
@@ -131,11 +137,12 @@ async fn main() -> std::io::Result<()> {
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
     let request_cache: HashMap<RequestObject, CacheObject> = HashMap::new();
-    let state = web::Data::new(AppState { env, request_cache });
+    let state = web::Data::new(AppState { env, request_cache: Mutex::new(request_cache) });
 
     HttpServer::new(move || {
         App::new()
             .app_data(state.clone())
+            .service(blurb)
             .service(fs::Files::new("/static", "./static").show_files_listing())
             .service(page)
    })
