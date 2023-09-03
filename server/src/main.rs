@@ -62,13 +62,25 @@ struct RectPos {
 
 const BLURB_WIDTH: usize = 250;
 const BLURB_HEIGHT: usize = 100;
+const COLORS: &'static [&str] = &[
+    "dark:text-amber-200 text-amber-500",
+    "dark:text-lime-200 text-lime-500",
+    "dark:text-green-300 text-green-500",
+    "dark:text-emerald-300 text-emerald-600",
+    "dark:text-teal-200 text-teal-600",
+    "dark:text-cyan-200 text-cyan-600",
+    "dark:text-sky-300 text-sky-700",
+    "dark:text-indigo-300 text-indigo-700",
+    "dark:text-violet-300 text-violet-600",
+    "dark:text-purple-200 text-purple-800",
+    "dark:text-pink-300 text-pink-600"
 
+];
 #[post("/api/blurb")]
 async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestData>, req: HttpRequest) -> HttpResponse {
     
     let col_total: usize = req_data.grid_w / BLURB_WIDTH;
     let row_total: usize = req_data.grid_h / BLURB_HEIGHT;
-
     let mut positions: Vec<RectPos> = Vec::new();
     
     for x in 0..col_total {
@@ -100,6 +112,7 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
 
     let mut rng = rand::thread_rng();
     let choice = positions.choose(&mut rng).unwrap();
+    let random_color = COLORS.choose(&mut rng).unwrap();
     println!("RECT SELECTED | X: {}, Y{}", choice.col, choice.row);
     
     let mut cache = app_state.request_cache.lock().unwrap();
@@ -107,19 +120,21 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
     match random_response_result {
         Ok(random_response) => {
             return app_state.render_template("blurb.html", &req, context! {
+                text_color => random_color,
                 x => choice.col,
                 y => choice.row,
                 inner_text => random_response.inner_text,
                 url => random_response.url,
-                hidden_text => random_response.help_text
+                help_text => random_response.help_text
             });
         },
         Err(err) => {
+            println!("Response Error: {}", err);
             return app_state.render_template("error_blurb.html", &req, context! {
                 x => choice.col,
                 y => choice.row,
                 inner_text => "An error occurred while making the API request",
-                hidden_text => format!("Error Message: {}", err)
+                help_text => format!("Error Message: {}", err)
             });
         }
     }

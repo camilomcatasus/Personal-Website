@@ -46,7 +46,8 @@
 			}
 			var index = 1;
 			var consoleTyper = setInterval(function() {
-				sender.innerHTML = text.substring(0, index);
+                
+				sender.firstElementChild.innerHTML = text.substring(0, index);
 				if(text.length <= index)
 				{
 					sender.classList.add("opacity-0");
@@ -54,7 +55,17 @@
 					clearInterval(consoleTyper);
 					return;
 				}
-				index += 1;
+
+                let indexChange = 1;
+                if (text.charAt(index + indexChange) == "<")
+                {
+                    while (text.charAt(index + indexChange) != ">")
+                    {
+                        indexChange += 1;
+                    }
+                }
+
+				index += indexChange;
 			}, 50);
 		}
 
@@ -102,6 +113,7 @@
                 displayText(elt);
             }
         });
+
 	</script>
 </head>
 <body class="w-screen h-screen flex flex-col overflow-x-hidden relative transition-colors bg-white dark:bg-slate-800">

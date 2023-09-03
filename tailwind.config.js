@@ -1,9 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	darkMode: 'class',
-	content: ["./**/*.{html, rs}"],
+	content: ["./**/*.{html,rs}"],
   theme: {
-    extend: {},
+      extend: {
+        colors: {
+            'slate-850' : "#141f38",
+        },
+      },
   },
   plugins: [],
 }
