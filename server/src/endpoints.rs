@@ -5,6 +5,8 @@ use rand::seq::SliceRandom;
 use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
+use chrono::Datelike;
+
 mod environment;
 
 
@@ -23,6 +25,7 @@ pub enum RequestObject {
     AirQualityRequest,
     LastAnimeRequest,
     LeagueRankRequest,
+    HistoricalEventRequest,
     //AnimeStatsRequest,
 }
 
@@ -79,7 +82,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
                                     "<li class='text-indigo-600'>Very Unhealthy: 201 to 300</li>",
                                     "<li class='text-rose-700'>Hazardous: 301 and higher</li>"));
             new_url = String::from("https://api-ninjas.com/api/airquality");
-            response_keep_alive = Duration::new(MINUTE * 30, 0);
+            response_keep_alive = Duration::new(HOUR, 0);
         },
         RequestObject::LastAnimeRequest => {
             let response: MalResponse = client.get("https://api.myanimelist.net/v2/users/unkownfire25/animelist?sort=list_updated_at&status=completed")
@@ -112,6 +115,32 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
             new_help_text = None;
             new_url = String::from("https://developer.riotgames.com/apis#league-v4/GET_getLeagueEntriesForSummoner");
             response_keep_alive = Duration::new(HOUR, 0);
+        },
+        RequestObject::HistoricalEventRequest => {
+            let current_date = chrono::Utc::now();
+            let current_month = current_date.month();
+            let current_day = current_date.day();
+
+            let response_raw: String = client.get(format!("https://api.api-ninjas.com/v1/historicalevents?day={}&month={}", current_day, current_month))
+                .header("X-Api-Key", environment::NINJA_API_KEY)
+                .send().await?
+                .text().await?;
+
+            let mut response: Vec<HistoricalEventResponse> = serde_json::from_str(&response_raw)?;
+
+            let historical_option = response.pop();
+
+            
+            match historical_option {
+                Some(historical_event) => 
+                    new_inner_text = format!("Today {}/{}:{}", current_month, current_day, historical_event.event),
+                None => 
+                    new_inner_text = String::from("No historical events occurred today!")
+            }
+            
+            new_help_text = None;
+            new_url = String::from("https://api-ninjas.com/api/historicalevents");
+            response_keep_alive = Duration::new(HOUR * 24, 0);
         },
     }
 
@@ -176,7 +205,6 @@ pub struct MalListStatus {
     pub num_episodes_watched: Option<i64>,
 }
 
-
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all(deserialize = "camelCase"))]
 pub struct LeagueRankResponse {
@@ -193,4 +221,12 @@ pub struct LeagueRankResponse {
     pub inactive: bool,
     pub fresh_blood: bool,
     pub hot_streak: bool
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct HistoricalEventResponse {
+    pub year: String,
+    pub month: String,
+    pub day: String,
+    pub event: String
 }
