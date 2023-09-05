@@ -116,8 +116,8 @@
 
 	</script>
 </head>
-<body class="w-screen h-screen flex flex-col overflow-x-hidden relative transition-colors bg-white dark:bg-slate-800">
-	<div class="relative w-full h-full overflow-y-auto ">
+<body class="w-screen h-screen overflow-x-hidden overflow-y-scroll relative transition-colors bg-white dark:bg-slate-800">
+	<div id="dashboard-section" class="relative h-screen h-full overflow-y-visible ">
 		<div class="absolute top-0 right-0 h-32 w-32 pt-4 pr-4">
 			{{ toggle() }}
 		</div>
@@ -137,5 +137,11 @@
                 </div>
 		</div>
 	</div>
+    <div id="projects-section"
+        class="w-full min-h-screen flex items-center justify-center">
+            <div class="flex max-w">
+            </div>
+        <div>
+    </div>
 </body>
 </html>

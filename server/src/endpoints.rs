@@ -95,16 +95,20 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
             response_keep_alive = Duration::new(HOUR * 12, 0);
         },
         RequestObject::LeagueRankRequest => {
-            let response: Vec<LeagueRankResponse> = client.get("https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/cbOutPi9615Fn8WgciJfCwBv5A72Fuheo5zAFcIaGec2jI4")
+            
+            let response_raw = client.get("https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/lQVQ5WysORkE3p0673gDfTeKTyJceQ886Imu5jI3HVqpGLs")
                 .header("X-Riot-Token", environment::RIOT_API_KEY)
-                .send().await?
-                .json().await?;
+                .send().await?;
+
+            let text_response = response_raw.text().await?;
+            println!("League Response Text Body: {}", text_response);
+            let response: Vec<LeagueRankResponse> = serde_json::from_str(&text_response)?;
 
             let ranked_flex_response = response.iter().find( |e| e.queue_type == "RANKED_FLEX_SR").context("Ranked Flex not found")?;
             let rank = ranked_flex_response.rank.clone().context("Rank not found in response")?;
             let tier = ranked_flex_response.tier.clone().context("Tier not found in response")?;
 
-            new_inner_text = format!("I am currently rank {} {} in League of Legends", tier, rank);
+            new_inner_text = format!("I am currently {} {} in League of Legends", tier, rank);
             new_help_text = None;
             new_url = String::from("https://developer.riotgames.com/apis#league-v4/GET_getLeagueEntriesForSummoner");
             response_keep_alive = Duration::new(HOUR, 0);
@@ -172,8 +176,9 @@ pub struct MalListStatus {
     pub num_episodes_watched: Option<i64>,
 }
 
+
 #[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all(deserialize = "camelCase"))]
 pub struct LeagueRankResponse {
     pub league_id: Option<String>,
     pub queue_type: String,
