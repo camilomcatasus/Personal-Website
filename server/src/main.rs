@@ -130,10 +130,11 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
         },
         Err(err) => {
             println!("Response Error: {}", err);
-            return app_state.render_template("error_blurb.html", &req, context! {
+            return app_state.render_template("blurb.html", &req, context! {
                 x => choice.col,
                 y => choice.row,
                 inner_text => "An error occurred while making the API request",
+                url => "",
                 help_text => format!("Error Message: {}", err)
             });
         }
