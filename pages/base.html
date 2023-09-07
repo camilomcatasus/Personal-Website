@@ -19,7 +19,7 @@
 <!doctype html>
 <html class="dark" >
 <head >
-	<title>Cambucha</title>
+	<title>Yurts are awesome</title>
 	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
 	<style>
 		:root {
@@ -29,90 +29,15 @@
 	<script src="/static/htmx.min.js"></script>
 	<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 	<script src="https://kit.fontawesome.com/6cf318b276.js" crossorigin="anonymous"></script>
+    <script src="/blurb_handling.js"></script>
 	<script>
 		function toggle(sender) {
-			let documentClass = document.documentElement.classList;
-			if(documentClass.value == "dark")
-				documentClass.remove("dark");
-			else
-				documentClass.add("dark");
-		}
-
-		function displayText(sender, sentText) {
-			var text = sender.getAttribute("api-text");
-			if (!text)
-			{
-				text = sentText;
-			}
-			var index = 1;
-			var consoleTyper = setInterval(function() {
-                
-				sender.firstElementChild.innerHTML = text.substring(0, index);
-				if(text.length <= index)
-				{
-					sender.classList.add("opacity-0");
-					sender.addEventListener('transitionend', () => handleTransitionEnd(sender));
-					clearInterval(consoleTyper);
-					return;
-				}
-
-                let indexChange = 1;
-                if (text.charAt(index + indexChange) == "<")
-                {
-                    while (text.charAt(index + indexChange) != ">")
-                    {
-                        indexChange += 1;
-                    }
-                }
-
-				index += indexChange;
-			}, 50);
-		}
-
-		function handleTransitionEnd(sender) {
-			let firstComputedStatus = window.getComputedStyle(sender);
-			if (firstComputedStatus.getPropertyValue("opacity") == 0) {
-				setTimeout(() => {
-					let currentComputedStatus = window.getComputedStyle(sender);
-					if(currentComputedStatus.getPropertyValue("opacity") == 0) {
-						sender.remove();
-					}
-				}, 1000);
-			}
-		}
-
-        function getGridHeight() {
-            return document.getElementById('landing-page-grid').clientHeight;
+            let documentClass = document.documentElement.classList;
+            if(documentClass.value == "dark")
+                documentClass.remove("dark");
+            else
+                documentClass.add("dark");
         }
-
-        function getGridWidth() {
-            return document.getElementById('landing-page-grid').clientWidth;
-        }
-
-        function getRects() {
-            let grid = document.getElementById('landing-page-grid');
-            let childRects = grid.children;
-            let rectList = [];
-            for (let childRect of childRects) {
-                let col = parseInt(childRect.getAttribute("x"));
-                let row = parseInt(childRect.getAttribute("y"));
-                
-                if(col && row ) {
-                    console.log(col, row);
-                    rectList.push({
-                        "col": col,
-                        "row": row
-                    });
-                }
-            }
-            return rectList;
-        }
-
-        htmx.onLoad((elt) => {
-            if(elt.getAttribute("api-text")) {
-                displayText(elt);
-            }
-        });
 
 	</script>
 </head>
@@ -125,12 +50,11 @@
 				<h1 id="welcome-text" 
 					class="dark:text-white text-7xl" >
 					I'm Camilo,
-					</br>
+					<br/>
 					Welcome to my website...
 				</h1>
                 <div id="landing-page-grid" class="absolute grid inset-0 p-8 auto-cols-[250px] auto-rows-[100px]"
                     hx-post="/api/blurb"
-                    hx-trigger="every 2s"
                     hx-swap="beforeend"
                     hx-vals="js:{displayed_rects: getRects(), grid_h: getGridHeight(), grid_w: getGridWidth()}"
                     hx-ext="json-enc">

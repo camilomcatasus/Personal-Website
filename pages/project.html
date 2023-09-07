@@ -1,0 +1,13 @@
+<div class="w-[50px] h-[50px] md:w-[100px] md:h-[100px] lg:w-[150px] lg:w-[150px] xl:w-[200px] xl:w-[200px]"
+    onclick="projectClicked(this);">
+    <img class="w-full h-full object-contain"
+        src="{% block image_url %}https://picsum.photos/200{% endblock %}">
+    <div class="hidden w-full absolute h-full top-0 left-0" project-extra-content>
+        <h2 class="lg:text-2xl dark:text-white underline underline-offset-8 decoration-from-font">
+            {% block project-title %}{% endblock %}
+        </h2>
+        <div class="lg:text-lg dark:text-white pt-4 overflow-y-scroll">
+            {% block project-body %}{% endblock %}
+        </div>
+    </div>
+</div>
