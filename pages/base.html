@@ -16,6 +16,7 @@
 		</div>
 	</div>
 {% endmacro %}
+{% from 'svg_macros' import githubIcon %}
 <!doctype html>
 <html class="dark" >
 <head >
@@ -29,7 +30,7 @@
 	<script src="/static/htmx.min.js"></script>
 	<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
 	<script src="https://kit.fontawesome.com/6cf318b276.js" crossorigin="anonymous"></script>
-    <script src="/blurb_handling.js"></script>
+    <script src="/static/blurb_handling.js"></script>
 	<script>
 		function toggle(sender) {
             let documentClass = document.documentElement.classList;
@@ -39,13 +40,20 @@
                 documentClass.add("dark");
         }
 
-        function 
+        function checkDashVisible() {
+        }
 
 	</script>
 </head>
 <body class="w-screen h-screen overflow-x-hidden overflow-y-scroll relative transition-colors bg-white dark:bg-slate-800">
 	<div id="dashboard-section" class="relative h-screen h-full overflow-y-visible ">
-		<div class="absolute top-0 right-0 h-32 w-32 pt-4 pr-4">
+		<div class="absolute top-0 flex gap-4 right-0 h-32 w-32 pt-4 pr-4">
+            <a href="https://linkedin.com/camilomcatasus">
+                
+            </a>
+            <a href="https://github.com/camilomcatasus">
+                {{ githubIcon() }}
+            </a>
 			{{ toggle() }}
 		</div>
 		<div id="landing-page" class="h-screen w-full justify-center items-center flex relative">
@@ -56,6 +64,7 @@
 					Welcome to my website...
 				</h1>
                 <div id="landing-page-grid" class="absolute grid inset-0 p-8 auto-cols-[250px] auto-rows-[100px]"
+                    hx-trigger="every[checkDashVisible()] 2s"
                     hx-post="/api/blurb"
                     hx-swap="beforeend"
                     hx-vals="js:{displayed_rects: getRects(), grid_h: getGridHeight(), grid_w: getGridWidth()}"
@@ -64,13 +73,22 @@
 		</div>
 	</div>
     <div id="projects-section"
-        class="w-full p-20 flex flex-col items-center justify-center">
+        class="w-full p-20 flex flex-col gap-12 items-center justify-center">
         <div>
             <h2 class="w-full text-5xl dark:text-white pb-8 underline underline-offset-8">
                 Things I'm working on
             </h2>
             <div class="flex flex-wrap md:w-[500px] md:h-[200px] lg:w-[750px] lg:h-[300px] xl:w-[1000px] xl:h-[400px]">
                 {% include 'thrive.html' %}
+                {% include 'descent.html' %}
+            </div>
+        </div>
+        <div>
+            <h2 class="w-full text-5xl dark:text-white pb-8 underline underline-offset-8">
+                Fun Nonsense
+            </h2>
+            <div class="flex flex-wrap md:w-[500px] md:h-[200px] lg:w-[750px] lg:h-[300px] xl:w-[1000px] xl:h-[400px]">
+
             </div>
         </div>
     </div>
