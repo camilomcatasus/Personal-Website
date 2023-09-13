@@ -141,9 +141,29 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
     }
 }
 
+#[derive(Serialize, Deserialize)]
+struct Project<'a> {
+    pub image_url: &'a str ,
+    pub title: &'a str,
+    pub information: &'a str,
+}
+
 #[get("/{tail:.*}")]
 async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
-    return app_state.render_template("base.html", &req, context! {});
+    let serious_projects: Vec<Project> = vec! [
+        Project {
+            image_url: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Thrive.png",
+            title: "Thrive",
+            information: "<a href=\"https://github.com/Revolutionary-Games/Thrive\">Thrive</a> is a simulation open-source game made by Revolutionary Games Studio for PC, Mac, and Linux.
+                "
+        },
+        Project {
+            image_url: "",
+            title: "Descent",
+            information: "<a href=\"Descent\">"
+        }
+    ];
+    return app_state.render_template("base.html", &req, context! { serious_projects => serious_projects });
 }
 
 #[actix_web::main]
