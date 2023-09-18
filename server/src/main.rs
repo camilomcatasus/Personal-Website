@@ -1,4 +1,6 @@
 mod endpoints;
+use std::fs::File;
+use std::io::BufReader;
 use std::sync::Mutex;
 use std::cell::RefCell;
 use endpoints::{getApiText, RequestObject, CacheObject, ResponseObject};
@@ -142,27 +144,20 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
 }
 
 #[derive(Serialize, Deserialize)]
-struct Project<'a> {
-    pub image_url: &'a str ,
-    pub title: &'a str,
-    pub information: &'a str,
+struct Project {
+    pub image_url: String,
+    pub title: String,
+    pub information: String,
 }
 
 #[get("/{tail:.*}")]
 async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
-    let serious_projects: Vec<Project> = vec! [
-        Project {
-            image_url: "https://upload.wikimedia.org/wikipedia/commons/e/e8/Thrive.png",
-            title: "Thrive",
-            information: "<a href=\"https://github.com/Revolutionary-Games/Thrive\">Thrive</a> is a simulation open-source game made by Revolutionary Games Studio for PC, Mac, and Linux.
-                "
-        },
-        Project {
-            image_url: "",
-            title: "Descent",
-            information: "<a href=\"Descent\">"
-        }
-    ];
+
+    let projects_file = File::open("./data/projects.json").unwrap();
+    let reader = BufReader::new(projects_file);
+
+    
+    let serious_projects: Vec<Project> = serde_json::from_reader(reader).unwrap();
     return app_state.render_template("base.html", &req, context! { serious_projects => serious_projects });
 }
 

@@ -78,12 +78,12 @@
             <h2 class="w-full text-5xl dark:text-white pb-8 underline underline-offset-8">
                 Things I'm working on
             </h2>
-            {% for project in projects %}
-                <div class="flex flex-wrap md:w-[500px] md:h-[200px] lg:w-[750px] lg:h-[300px] xl:w-[1000px] xl:h-[400px]">
+            <div class="flex flex-wrap md:w-[500px] md:h-[200px] lg:w-[750px] lg:h-[300px] xl:w-[1000px] xl:h-[400px]">
+                {% for project in serious_projects %}
                     <div class="w-[50px] h-[50px] md:w-[100px] md:h-[100px] lg:w-[150px] lg:h-[150px] xl:w-[200px] xl:h-[200px]"
                         onclick="projectClicked(this);">
-                        <img class="w-full h-full object-cover"
-                        src="{{ project.img_url }}">
+                        <img class="w-full h-full object-cover cursor-pointer"
+                        src="{{ project.image_url }}">
                         <div class="hidden w-full absolute h-full top-0 left-0" project-extra-content>
                             <h2 class="lg:text-2xl dark:text-white underline underline-offset-8 decoration-from-font">
                                 {{ project.title }}
@@ -93,8 +93,8 @@
                             </div>
                         </div>
                     </div>            
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
         <div>
             <h2 class="w-full text-5xl dark:text-white pb-8 underline underline-offset-8">
