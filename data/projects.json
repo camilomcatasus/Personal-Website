@@ -8,5 +8,10 @@
         "image_url": "https://img.itch.zone/aW1nLzk5OTIyMzQucG5n/original/kSSOIH.png",
         "title": "Descent",
         "information": "<a href=\"https://camilomcatasus.itch.io/descent>Descent</a> is a game I worked on as a school project for the Game Content Production class at the University of Florida."
+    },
+    {
+        "image_url": ""
+        "title": "Clerk SDK for Rust",
+        "information": "An unoficial Clerk SDK for the Rust programming language."
     }
 ]

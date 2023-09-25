@@ -7,6 +7,7 @@ use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use chrono::Datelike;
 
+mod models;
 mod environment;
 
 
@@ -26,6 +27,7 @@ pub enum RequestObject {
     LastAnimeRequest,
     LeagueRankRequest,
     HistoricalEventRequest,
+    BreakingNewsRequest,
     //AnimeStatsRequest,
 }
 
@@ -68,7 +70,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
 
     match *choice {
         RequestObject::AirQualityRequest => {
-            let response: AirQuality = client.get("https://api.api-ninjas.com/v1/airquality?city=Miami")
+            let response: models::AirQuality = client.get("https://api.api-ninjas.com/v1/airquality?city=Miami")
                 .header("X-Api-Key", environment::NINJA_API_KEY)
                 .send().await?
                 .json().await?;
@@ -85,7 +87,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
             response_keep_alive = Duration::new(HOUR, 0);
         },
         RequestObject::LastAnimeRequest => {
-            let response: MalResponse = client.get("https://api.myanimelist.net/v2/users/unkownfire25/animelist?sort=list_updated_at&status=completed")
+            let response: models::MalResponse = client.get("https://api.myanimelist.net/v2/users/unkownfire25/animelist?sort=list_updated_at&status=completed")
                 .header("X-MAL-CLIENT-ID", environment::MAL_API_KEY)
                 .send().await?
                 .json().await?;
@@ -105,7 +107,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
 
             let text_response = response_raw.text().await?;
             println!("League Response Text Body: {}", text_response);
-            let response: Vec<LeagueRankResponse> = serde_json::from_str(&text_response)?;
+            let response: Vec<models::LeagueRankResponse> = serde_json::from_str(&text_response)?;
 
             let ranked_flex_response = response.iter().find( |e| e.queue_type == "RANKED_FLEX_SR").context("Ranked Flex not found")?;
             let rank = ranked_flex_response.rank.clone().context("Rank not found in response")?;
@@ -126,7 +128,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
                 .send().await?
                 .text().await?;
 
-            let mut response: Vec<HistoricalEventResponse> = serde_json::from_str(&response_raw)?;
+            let mut response: Vec<models::HistoricalEventResponse> = serde_json::from_str(&response_raw)?;
 
             let historical_option = response.pop();
 
@@ -142,6 +144,30 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
             new_url = String::from("https://api-ninjas.com/api/historicalevents");
             response_keep_alive = Duration::new(HOUR * 24, 0);
         },
+        RequestObject::BreakingNewsRequest => {
+
+            let response: models::BreakingNewsResponse = client.get(
+                format!("https://newsdata.io/api/1/news?apikey={}&country=au,us", environment::NEWS_DATA_API_KEY))
+                .send().await?
+                .json().await?;
+
+            let top_story_option = response.results.first();
+
+            match top_story_option {
+                Some(top_story) => {
+                    new_inner_text = format!("Breaking News! <a href=\"{}\">{}</a>", top_story.link, top_story.title);
+                    new_help_text = Some(format!("{}</br>", top_story.description));
+                },
+                None => {
+                    new_inner_text = "No news today I guess!".to_string();
+                    new_help_text = None;
+                }
+            }
+
+
+            new_url = String::from("https://newsdata.io/documentation");
+            response_keep_alive = Duration::new(HOUR + MINUTE * 30, 0);
+        }
     }
 
     let final_response = ResponseObject {
@@ -161,72 +187,3 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
     return Ok(final_response);
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct AirQuality {
-    overall_aqi: usize
-}
- 
-#[derive(Serialize, Deserialize)]
-pub struct AirQualityField {
-    concentration: f64,
-    aqi: usize
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct MalResponse {
-    pub data: Vec<MalDaum>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct MalDaum {
-    pub node: MalNode,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct MalNode {
-    pub id: i64,
-    pub title: String,
-    pub main_picture: MalMainPicture,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
-pub struct MalMainPicture {
-    pub medium: String,
-    pub large: String
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct MalListStatus {
-    pub status: String,
-    pub score: i64,
-    pub num_watched_episodes: Option<i64>,
-    pub is_rewatching: bool,
-    pub updated_at: String,
-    pub num_episodes_watched: Option<i64>,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all(deserialize = "camelCase"))]
-pub struct LeagueRankResponse {
-    pub league_id: Option<String>,
-    pub queue_type: String,
-    pub tier: Option<String>,
-    pub rank: Option<String>,
-    pub summoner_id: String,
-    pub summoner_name: String,
-    pub league_points: u64,
-    pub wins: u64,
-    pub losses: u64,
-    pub veteran: bool,
-    pub inactive: bool,
-    pub fresh_blood: bool,
-    pub hot_streak: bool
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct HistoricalEventResponse {
-    pub year: String,
-    pub month: String,
-    pub day: String,
-    pub event: String
-}
