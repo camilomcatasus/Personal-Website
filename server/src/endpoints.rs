@@ -155,15 +155,21 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
 
             match top_story_option {
                 Some(top_story) => {
+
                     new_inner_text = format!("Breaking News! <a href=\"{}\">{}</a>", top_story.link, top_story.title);
-                    new_help_text = Some(format!("{}</br>", top_story.description));
+                    let video_block: String = match &top_story.video_url {
+                        Some(val) => {
+                            format!("<video controls><source src=\"{}\" type=\"video/mp4\"></video>", val)
+                        }
+                        None => String::new(),
+                    };
+                    new_help_text = Some(format!("{}</br>{}", top_story.description, video_block));
                 },
                 None => {
                     new_inner_text = "No news today I guess!".to_string();
                     new_help_text = None;
                 }
             }
-
 
             new_url = String::from("https://newsdata.io/documentation");
             response_keep_alive = Duration::new(HOUR + MINUTE * 30, 0);
