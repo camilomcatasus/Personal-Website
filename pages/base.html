@@ -75,12 +75,12 @@
     <div id="projects-section"
         class="w-full p-20 flex flex-col gap-12 items-center justify-center">
         <div>
-            <h2 class="w-full text-5xl dark:text-white pb-8 underline underline-offset-8">
+            <h2 class="w-full text-3xl md:text-5xl dark:text-white pb-8 underline underline-offset-8">
                 Things I've worked on 
             </h2>
-            <div class="flex flex-wrap md:w-[500px] md:h-[200px] lg:w-[750px] lg:h-[300px] xl:w-[1000px] xl:h-[400px]">
+            <div class="flex flex-wrap w-[200px] h-[600px] md:w-[750px] md:h-[250px] lg:w-[900px] lg:h-[300px] xl:w-[1050px] xl:h-[350px]">
                 {% for project in serious_projects %}
-                    <div class="w-[50px] h-[50px] md:w-[100px] md:h-[100px] lg:w-[150px] lg:h-[150px] xl:w-[200px] xl:h-[200px]"
+                    <div class="w-[200px] h-[200px] md:w-[250px] md:h-[250px] lg:w-[300px] lg:h-[300px] xl:w-[350px] xl:h-[350px]"
                         onclick="projectClicked(this);">
                         <img class="w-full h-full object-cover cursor-pointer"
                         src="{{ project.image_url }}">
@@ -100,8 +100,22 @@
             <h2 class="w-full text-5xl dark:text-white pb-8 underline underline-offset-8">
                 Fun Nonsense
             </h2>
-            <div class="flex flex-wrap md:w-[500px] md:h-[200px] lg:w-[750px] lg:h-[300px] xl:w-[1000px] xl:h-[400px]">
-                
+            <div class="flex flex-wrap w-[200px] h-[600px] md:w-[750px] md:h-[250px] lg:w-[900px] lg:h-[300px] xl:w-[1050px] xl:h-[350px]">
+                {% for project in fun_projects %}
+                    <div class="w-[200px] h-[200px] md:w-[250px] md:h-[250px] lg:w-[300px] lg:h-[300px] xl:w-[350px] xl:h-[350px]"
+                        onclick="projectClicked(this);">
+                        <img class="w-full h-full object-cover cursor-pointer"
+                        src="{{ project.image_url }}">
+                        <div class="hidden w-full absolute h-full top-0 left-0" project-extra-content>
+                            <h2 class="lg:text-2xl dark:text-white underline underline-offset-8 decoration-from-font">
+                                {{ project.title }}
+                            </h2>
+                            <div class="lg:text-lg dark:text-white pt-4 overflow-y-scroll">
+                                {{ project.information }}
+                            </div>
+                        </div>
+                    </div>            
+                {% endfor %}
             </div>
         </div>
     </div>
