@@ -155,8 +155,7 @@ async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
 
     let projects_file = File::open("./data/projects.json").unwrap();
     let reader = BufReader::new(projects_file);
-
-    
+   
     let serious_projects: Vec<Project> = serde_json::from_reader(reader).unwrap();
     return app_state.render_template("base.html", &req, context! { serious_projects => serious_projects });
 }
