@@ -7,12 +7,15 @@
 		{% for cell in row %}
 			{% if cell.type == "snake" %}
 			<div class="bg-white">
-				<input name="snake" type="hidden" value="{{cell.pos}}, {{cell.snake_index}}" />
+                <input name="snake" type="hidden" value="{{cell.pos}}, {{cell.snake_index}}" />
 			</div>
 			{% else if cell.type == "apple" %}
 			<div class="bg-amber-500">
-				<input name="cells" type="hidden" value="{{cell.pos}}" />
+                <input name="cells" type="hidden" value="{{cell.pos}}" />
 			</div>
+            {% else %}
+            <div>
+            </div>
 			{% endif %}
 		{% endfor %}
 	{% endfor %}

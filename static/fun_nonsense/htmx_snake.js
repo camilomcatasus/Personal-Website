@@ -8,17 +8,33 @@ const D_KEY = 68;
 const A_KEY = 65;
 
 function switchKey(direction) {
-	getElementById("gameboard");
+    let directionField = document.getElementById("direction");
+    directionField.setAttribute("value", direction);
 }
 
-document.addEventListener("keydown", (event) => {
+document.onLoad(() => {
+    document.addEventListener("keydown", (event) => {
 
-	switch(event.keyCode)
-	{
-		case LEFT_KEY: 
-		case A_KEY:
-			{
-				
-			} break;
-	}
+        switch(event.keyCode)
+        {
+            case LEFT_KEY: 
+            case A_KEY:
+                switchKey(1);
+                break;
+            case UP_KEY:
+            case W_KEY:
+                switchKey(2);
+                break;
+            case RIGHT_KEY:
+            case D_KEY:
+                switchKey(3);
+                break;
+            case DOWN_KEY:
+            case S_KEY:
+                switchKey(4);
+                break;
+        }
+
+    });
 });
+
