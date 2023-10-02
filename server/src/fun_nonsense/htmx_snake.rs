@@ -3,6 +3,8 @@ use serde::{Serialize, Deserialize};
 use minijinja::context;
 use models::AppState;
 
+const GRID_SIZE: usize = 15;
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Row {
     cells: Vec<Cell>
@@ -19,8 +21,9 @@ struct Cell {
 struct SnakeResponse {
     snake: Vec<String>,
     direction: String,
-    cells: Vec<String>
+    apple: String 
 }
+
 
 #[get("/fun-nonsense/htmx-snake")]
 pub async fn snake_game(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
@@ -28,8 +31,10 @@ pub async fn snake_game(app_state: web::Data<AppState>, req: HttpRequest) -> Htt
 }
 
 #[post("/fun-nonsense/htmx-snake/step")]
-pub async fn snake_step(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    let grid: Vec<Row> = Vec::new();
+pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<SnakeResponse>, req: HttpRequest) -> HttpResponse {
+    let mut cells: Vec<Cell> = Vec::new();
+
+
 
     return app_state.render_template("htmx_snake_gameboard.html", &req, context! { grid => grid });
 }
@@ -39,13 +44,13 @@ fn get_new_grid() -> Vec<Row> {
     let snake_start = 5;
     let apple_start_x = 7;
     let apple_start_y = 7;
-    for y in 0..10 {
+    for y in 0..GRID_SIZE {
 
         let mut row: Row = Row {
             cells: Vec::new(),
         };
 
-        for x in 0..10 {
+        for x in 0..GRID_SIZE {
             let mut cell: Cell = Cell {
                 cell_type: None,
                 snake_index: 0,
