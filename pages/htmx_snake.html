@@ -1,3 +1,4 @@
+{% extends "fun_nonsense_base.html" %}
 {% block title %} Snake in HTMX! {% endblock %}
 {% block static_files %}
 <script src="/static/fun_nonsense/htmx_snake.js"></script>
@@ -6,7 +7,7 @@
 {% endblock %}
 {% block content %}
 <form>
-	{% include "htmx_snake_gameboard" %}
+	{% include "htmx_snake_gameboard.html" %}
 	<input id="direction" name="direction" type="hidden" value="1" />
 </form>
 <button 

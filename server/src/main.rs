@@ -1,51 +1,17 @@
 mod endpoints;
+mod fun_nonsense;
 use std::fs::File;
 use std::io::BufReader;
 use std::sync::Mutex;
-use std::cell::RefCell;
-use endpoints::{getApiText, RequestObject, CacheObject, ResponseObject};
+use endpoints::get_api_text;
 use actix_files as fs;
-use actix_web::http::header::ContentType;
 use serde::{ Serialize, Deserialize };
 use actix_web::{web, get, post, App, HttpServer, HttpRequest, HttpResponse};
-use minijinja::value::Value;
 use minijinja::{path_loader, Environment, context};
 use rand::seq::SliceRandom;
 use std::collections::HashMap;
-
-thread_local! {
-    static CURRENT_REQUEST: RefCell<Option<HttpRequest>> = RefCell::default()
-}
-
-fn with_bound_req<F, R>(req: &HttpRequest, f: F) -> R
-where 
-    F: FnOnce() -> R, 
-{
-    CURRENT_REQUEST.with(|current_req| *current_req.borrow_mut() = Some(req.clone()));
-    let rv = std::panic::catch_unwind(std::panic::AssertUnwindSafe(f));
-    CURRENT_REQUEST.with(|current_req| current_req.borrow_mut().take());
-    match rv {
-        Ok(rv) => rv,
-        Err(panic) => std::panic::resume_unwind(panic),
-    }
-}
-
-pub struct AppState {
-    env: minijinja::Environment<'static>,
-    request_cache: Mutex<HashMap<RequestObject, CacheObject>>,
-}
-
-impl AppState {
-    pub fn render_template(&self, name: &str, req: &HttpRequest, ctx: Value) -> HttpResponse {
-        with_bound_req(req, || {
-            let tmpl = self.env.get_template(name).unwrap();
-            let rv = tmpl.render(ctx).unwrap();
-            HttpResponse::Ok()
-                .content_type(ContentType ::html())
-                .body(rv)
-        })
-    }
-}
+use models::{AppState, RequestObject, ResponseObject, CacheObject};
+use fun_nonsense::htmx_snake::{snake_step, snake_reset, snake_game};
 
 #[derive(Serialize, Deserialize)]
 struct BlurbRequestData {
@@ -118,7 +84,7 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
     println!("RECT SELECTED | X: {}, Y{}", choice.col, choice.row);
     
     let mut cache = app_state.request_cache.lock().unwrap();
-    let random_response_result: Result<ResponseObject, anyhow::Error> = getApiText(None, &mut cache).await;
+    let random_response_result: Result<ResponseObject, anyhow::Error> = get_api_text(None, &mut cache).await;
     match random_response_result {
         Ok(random_response) => {
             return app_state.render_template("blurb.html", &req, context! {
@@ -163,9 +129,9 @@ async fn page(app_state: web::Data<AppState>, req:HttpRequest) -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
-
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
+
     let request_cache: HashMap<RequestObject, CacheObject> = HashMap::new();
     let state = web::Data::new(AppState { env, request_cache: Mutex::new(request_cache) });
 
@@ -174,6 +140,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(state.clone())
             .service(blurb)
             .service(fs::Files::new("/static", "./static").show_files_listing())
+            .service(snake_game)
+            .service(snake_reset)
+            .service(snake_step)
             .service(page)
    })
     .bind(("127.0.0.1", 8080))?

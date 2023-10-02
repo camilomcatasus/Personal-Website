@@ -1,0 +1,13 @@
+[package]
+name = "models"
+version = "0.1.0"
+authors = ["Camilo <camilomcatasus@gmail.com>"]
+license = "Apache-2.0"
+edition = "2021"
+
+
+[dependencies]
+actix-web = "4"
+serde = {version = "1.0.162", features = ["derive"]}
+minijinja = {version = "1.0.5", features = ["loader"]}
+enum_macros = { path = "../enum_macros" }

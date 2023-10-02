@@ -1,1 +1,1 @@
-mod htmx_snake;
+pub mod htmx_snake;

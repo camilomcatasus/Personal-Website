@@ -12,9 +12,10 @@ function switchKey(direction) {
     directionField.setAttribute("value", direction);
 }
 
-document.onLoad(() => {
+window.onload = () => {
+        console.log("WHATS UP");
     document.addEventListener("keydown", (event) => {
-
+        console.log(event);
         switch(event.keyCode)
         {
             case LEFT_KEY: 
@@ -36,5 +37,5 @@ document.onLoad(() => {
         }
 
     });
-});
+};
 

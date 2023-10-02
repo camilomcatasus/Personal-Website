@@ -1,44 +1,19 @@
 use anyhow::Context;
-use serde::{Serialize, Deserialize};
-use enum_macros::EnumArray;
-use rand::seq::SliceRandom;
 use std::collections::HashMap;
-use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use chrono::Datelike;
-
-mod models;
+use models::{RequestObject, ResponseObject, CacheObject};
+use rand::seq::SliceRandom;
 mod environment;
+mod request_types;
 
 
 pub const MINUTE: u64 = 60;
 pub const HOUR: u64 = 3600;
 
-#[derive(Serialize, Deserialize, Clone)]
-pub struct ResponseObject {
-    pub inner_text: String,
-    pub help_text: Option<String>,
-    pub url: String
-}
 
-#[derive(EnumArray, PartialEq, Eq, Hash, Debug, Copy, Clone)]
-pub enum RequestObject {
-    AirQualityRequest,
-    LastAnimeRequest,
-    LeagueRankRequest,
-    HistoricalEventRequest,
-    BreakingNewsRequest,
-    //AnimeStatsRequest,
-}
 
-#[derive(Clone)]
-pub struct CacheObject {
-    last_get_time: Instant,
-    keep_alive: Duration,
-    last_response: ResponseObject
-}
-
-pub async fn getApiText( debug_option: Option<&RequestObject>, 
+pub async fn get_api_text( debug_option: Option<&RequestObject>, 
                         request_cache: &mut HashMap<RequestObject, CacheObject>) -> anyhow::Result<ResponseObject> {
     
     let choice: &RequestObject;
@@ -70,7 +45,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
 
     match *choice {
         RequestObject::AirQualityRequest => {
-            let response: models::AirQuality = client.get("https://api.api-ninjas.com/v1/airquality?city=Miami")
+            let response: request_types::AirQuality = client.get("https://api.api-ninjas.com/v1/airquality?city=Miami")
                 .header("X-Api-Key", environment::NINJA_API_KEY)
                 .send().await?
                 .json().await?;
@@ -87,7 +62,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
             response_keep_alive = Duration::new(HOUR, 0);
         },
         RequestObject::LastAnimeRequest => {
-            let response: models::MalResponse = client.get("https://api.myanimelist.net/v2/users/unkownfire25/animelist?sort=list_updated_at&status=completed")
+            let response: request_types::MalResponse = client.get("https://api.myanimelist.net/v2/users/unkownfire25/animelist?sort=list_updated_at&status=completed")
                 .header("X-MAL-CLIENT-ID", environment::MAL_API_KEY)
                 .send().await?
                 .json().await?;
@@ -107,7 +82,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
 
             let text_response = response_raw.text().await?;
             println!("League Response Text Body: {}", text_response);
-            let response: Vec<models::LeagueRankResponse> = serde_json::from_str(&text_response)?;
+            let response: Vec<request_types::LeagueRankResponse> = serde_json::from_str(&text_response)?;
 
             let ranked_flex_response = response.iter().find( |e| e.queue_type == "RANKED_FLEX_SR").context("Ranked Flex not found")?;
             let rank = ranked_flex_response.rank.clone().context("Rank not found in response")?;
@@ -128,7 +103,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
                 .send().await?
                 .text().await?;
 
-            let mut response: Vec<models::HistoricalEventResponse> = serde_json::from_str(&response_raw)?;
+            let mut response: Vec<request_types::HistoricalEventResponse> = serde_json::from_str(&response_raw)?;
 
             let historical_option = response.pop();
 
@@ -146,7 +121,7 @@ pub async fn getApiText( debug_option: Option<&RequestObject>,
         },
         RequestObject::BreakingNewsRequest => {
 
-            let response: models::BreakingNewsResponse = client.get(
+            let response: request_types::BreakingNewsResponse = client.get(
                 format!("https://newsdata.io/api/1/news?apikey={}&country=au,us", environment::NEWS_DATA_API_KEY))
                 .send().await?
                 .json().await?;

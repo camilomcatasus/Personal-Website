@@ -2,14 +2,15 @@
 	id="gameboard"
 	hx-post="/fun-nonsense/htmx-snake/step"
 	hx-trigger="load delay 1s" 
-	hx-swap="outerHTML">
+	hx-swap="outerHTML"
+    hx-ext="json-enc">
 	{% for row in grid %}
-		{% for cell in row %}
-			{% if cell.type == "snake" %}
+		{% for cell in row.cells %}
+			{% if cell.cell_type == "snake" %}
 			<div class="bg-white">
                 <input name="snake" type="hidden" value="{{cell.pos}}, {{cell.snake_index}}" />
 			</div>
-			{% else if cell.type == "apple" %}
+			{% elif cell.cell_type == "apple" %}
 			<div class="bg-amber-500">
                 <input name="cells" type="hidden" value="{{cell.pos}}" />
 			</div>
