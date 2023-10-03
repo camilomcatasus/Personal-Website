@@ -26,3 +26,4 @@ enum_macros = { path = "../enum_macros" }
 models = { path = "../models" }
 rand = "0.8.5"
 chrono = "0.4.29"
+env_logger = "0.10.0"

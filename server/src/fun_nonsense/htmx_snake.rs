@@ -18,7 +18,7 @@ struct Cell {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct SnakeResponse {
+pub struct SnakeResponse {
     snake: Vec<String>,
     direction: String,
     apple: String 
@@ -33,7 +33,7 @@ fn generate_empty_grid() -> Vec<Row> {
         };
 
         for x in 0..GRID_SIZE {
-            let mut cell: Cell = Cell {
+            let cell: Cell = Cell {
                 cell_type: None,
                 snake_index: 0,
                 pos: format!("{},{}", x, y)
@@ -55,7 +55,10 @@ pub async fn snake_game(app_state: web::Data<AppState>, req: HttpRequest) -> Htt
 pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<SnakeResponse>, req: HttpRequest) -> HttpResponse {
     let mut grid = generate_empty_grid();
 
-    
+    let (apple_x, apple_y) = match parse_apple_str(&req_data.apple) {
+        Ok(value) => value,
+        Err(_) => return HttpResponse::BadRequest().body("No Direction")
+    };
 
     let mut snake_cells: Vec<SnakeCell> = Vec::new();
 
@@ -111,12 +114,15 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
                         head_y += 1;
                     }
                 },
-                &_ => { return HttpResponse::BadRequest().finish(); }
+                &_ => { return HttpResponse::BadRequest().body("No Direction"); }
 
             }
 
+            
+
             let temp_new_head = grid[usize::from(head_y)].cells[usize::from(head_x)].clone();
             if temp_new_head.cell_type == Some("apple".to_string()) {
+                // TODO: return new apple
                 let old_tail = snake_cells.last().unwrap();
                 let new_tail = &mut grid[usize::from(old_tail.y)].cells[usize::from(old_tail.y)];
                 new_tail.cell_type = Some("snake".to_string());
@@ -129,6 +135,7 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
             new_head.cell_type = Some("snake".to_string());
             new_head.snake_index = 0;
 
+
             continue; 
         }
 
@@ -138,6 +145,7 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
         selected_grid_cell.cell_type = Some("snake".to_string());
     }
 
+    grid[usize::from(apple_y)].cells[usize::from(apple_x)].cell_type = Some("apple".to_string());
     return app_state.render_template("htmx_snake_gameboard.html", &req, context! { grid => grid });
 }
 
@@ -152,10 +160,18 @@ fn parse_snake_str(snake_str: &String) -> anyhow::Result<SnakeCell> {
     let parsed_snake_item = snake_str.split(',');
     let snake_item_list: Vec<&str> = parsed_snake_item.collect();
     return Ok(SnakeCell {
-        x: snake_item_list[0].parse()?,
-        y: snake_item_list[1].parse()?,
-        index: snake_item_list[2].parse()?
+        x: snake_item_list[0].trim().parse()?,
+        y: snake_item_list[1].trim().parse()?,
+        index: snake_item_list[2].trim().parse()?
     });
+}
+
+fn parse_apple_str(apple_str: &String) -> anyhow::Result<(u16, u16)> {
+    let parsed_apple_str = apple_str.split(',');
+    let apple_list: Vec<&str> = parsed_apple_str.collect();
+    let apple_x: u16 = apple_list[0].trim().parse()?;
+    let apple_y: u16 = apple_list[1].trim().parse()?;
+    return Ok((apple_x, apple_y));
 }
 
 fn get_new_grid() -> Vec<Row> {
@@ -171,7 +187,6 @@ fn get_new_grid() -> Vec<Row> {
     grid[snake_start - 1].cells[snake_start].snake_index = 1;
 
     grid[apple_start_y].cells[apple_start_x].cell_type = Some("apple".to_string());
-    println!("{:?}", grid);
     
     return grid;
 }

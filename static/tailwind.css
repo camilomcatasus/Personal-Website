@@ -695,8 +695,12 @@ video {
   grid-template-columns: repeat(10, minmax(0, 1fr));
 }
 
-.grid-rows-10 {
-  grid-template-rows: repeat(10, minmax(0, 1fr));
+.grid-cols-15 {
+  grid-template-columns: repeat(15, minmax(0, 1fr));
+}
+
+.grid-rows-15 {
+  grid-template-rows: repeat(15, minmax(0, 1fr));
 }
 
 .flex-col {

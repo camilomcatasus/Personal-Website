@@ -6,7 +6,7 @@ use std::sync::Mutex;
 use endpoints::get_api_text;
 use actix_files as fs;
 use serde::{ Serialize, Deserialize };
-use actix_web::{web, get, post, App, HttpServer, HttpRequest, HttpResponse};
+use actix_web::{web, get, post, App, HttpServer, HttpRequest, HttpResponse, middleware::Logger};
 use minijinja::{path_loader, Environment, context};
 use rand::seq::SliceRandom;
 use std::collections::HashMap;
@@ -135,8 +135,11 @@ async fn main() -> std::io::Result<()> {
     let request_cache: HashMap<RequestObject, CacheObject> = HashMap::new();
     let state = web::Data::new(AppState { env, request_cache: Mutex::new(request_cache) });
 
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+
     HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
             .app_data(state.clone())
             .service(blurb)
             .service(fs::Files::new("/static", "./static").show_files_listing())
