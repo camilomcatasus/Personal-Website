@@ -1,9 +1,10 @@
 use actix_web::{web, get, post, HttpRequest, HttpResponse};
+use rand::Rng;
 use serde::{Serialize, Deserialize};
 use minijinja::context;
 use models::AppState;
 
-const GRID_SIZE: u16 = 15;
+const GRID_SIZE: usize = 15;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Row {
@@ -13,7 +14,7 @@ struct Row {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Cell {
     cell_type: Option<String>,
-    snake_index: u16,
+    snake_index: usize,
     pos: String
 }
 
@@ -55,7 +56,7 @@ pub async fn snake_game(app_state: web::Data<AppState>, req: HttpRequest) -> Htt
 pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<SnakeResponse>, req: HttpRequest) -> HttpResponse {
     let mut grid = generate_empty_grid();
 
-    let (apple_x, apple_y) = match parse_apple_str(&req_data.apple) {
+    let (mut apple_x, mut apple_y) = match parse_apple_str(&req_data.apple) {
         Ok(value) => value,
         Err(_) => return HttpResponse::BadRequest().body("No Direction")
     };
@@ -76,6 +77,8 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
     let snake_len = snake_cells.len();
     snake_cells.sort_by_key(|cell| cell.index);
 
+    let mut gen_apple_flag = false;
+
     for current_snake_cell in &snake_cells {
         if current_snake_cell.index == 0 { 
             let mut head_x = current_snake_cell.x;
@@ -84,7 +87,7 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
             match req_data.direction.as_str() {
                 "1" => {
                     if head_x == 0 {
-                        head_x = (GRID_SIZE - 1).try_into().unwrap();
+                        head_x = GRID_SIZE - 1;
                     }
                     else {
                         head_x -= 1;
@@ -92,46 +95,38 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
                 },
                 "2" => {
                     if head_y == 0 {
-                        head_y = (GRID_SIZE - 1).try_into().unwrap();
+                        head_y = GRID_SIZE - 1;
                     }
                     else {
                         head_y -= 1;
                     }
                 },
                 "3" => {
-                    if head_x == GRID_SIZE - 1 {
-                        head_x = 0;
-                    }
-                    else {
-                        head_x += 1;
-                    }
+                    head_x.increment(GRID_SIZE);
                 },
                 "4" => {
-                    if head_y == GRID_SIZE - 1 {
-                        head_y = 0;
-                    }
-                    else {
-                        head_y += 1;
-                    }
+                    head_y.increment(GRID_SIZE);
                 },
                 &_ => { return HttpResponse::BadRequest().body("No Direction"); }
 
             }
 
-            
-
-            let temp_new_head = grid[usize::from(head_y)].cells[usize::from(head_x)].clone();
+            let temp_new_head = grid[head_y].cells[head_x].clone();
             if temp_new_head.cell_type == Some("apple".to_string()) {
-                // TODO: return new apple
+
+                if snake_len + 1 == usize::from(GRID_SIZE * GRID_SIZE) {
+                    return app_state.render_template("htmx_snake_win.html", &req, context! { grid => grid });
+                }
+                gen_apple_flag = true;
                 let old_tail = snake_cells.last().unwrap();
-                let new_tail = &mut grid[usize::from(old_tail.y)].cells[usize::from(old_tail.y)];
+                let new_tail = &mut grid[old_tail.y].cells[old_tail.y];
                 new_tail.cell_type = Some("snake".to_string());
-                new_tail.snake_index = u16::try_from(snake_len).unwrap();
+                new_tail.snake_index = snake_len;
             }
             else if temp_new_head.cell_type == Some("snake".to_string()) {
                 return app_state.render_template("htmx_snake_loss.html", &req, context! { grid => grid });
             }
-            let new_head = &mut grid[usize::from(head_y)].cells[usize::from(head_x)];
+            let new_head = &mut grid[head_y].cells[head_x];
             new_head.cell_type = Some("snake".to_string());
             new_head.snake_index = 0;
 
@@ -139,21 +134,61 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
             continue; 
         }
 
-        let old_snake_cell = &snake_cells[usize::from(current_snake_cell.index - 1)];
-        let selected_grid_cell = &mut grid[usize::from(old_snake_cell.y)].cells[usize::from(old_snake_cell.x)];
+        
+
+        let old_snake_cell = &snake_cells[current_snake_cell.index - 1];
+        let selected_grid_cell = &mut grid[old_snake_cell.y].cells[old_snake_cell.x];
         selected_grid_cell.snake_index = current_snake_cell.index;
         selected_grid_cell.cell_type = Some("snake".to_string());
     }
 
-    grid[usize::from(apple_y)].cells[usize::from(apple_x)].cell_type = Some("apple".to_string());
+    // Semi random apple generation
+    if gen_apple_flag {
+        let mut rng = rand::thread_rng();
+        let mut new_apple_x: usize = rng.gen_range(0..GRID_SIZE);
+        let mut new_apple_y: usize = rng.gen_range(0..GRID_SIZE);
+
+        let mut loop_condition: bool = true;
+        while loop_condition {
+            if grid[new_apple_y].cells[new_apple_x].cell_type == None {
+                loop_condition = false;
+            }
+            else {
+                if new_apple_x == GRID_SIZE - 1 {
+                    new_apple_y.increment(GRID_SIZE);
+                }
+                new_apple_x.increment(GRID_SIZE);
+            }
+        }
+
+        apple_x = new_apple_x;
+        apple_y = new_apple_y;
+    }
+
+    grid[apple_y].cells[apple_x].cell_type = Some("apple".to_string());
     return app_state.render_template("htmx_snake_gameboard.html", &req, context! { grid => grid });
+}
+
+trait UsizeExtensions {
+    fn increment(&mut self, limit: usize);
+}
+
+impl UsizeExtensions for usize {
+    fn increment(&mut self, limit: usize) {
+        if *self == limit - 1 {
+            *self = 0;
+        }
+        else  {
+            *self += 1;
+        }
+    }
 }
 
 #[derive(Clone)]
 struct SnakeCell {
-    pub index: u16,
-    pub x: u16,
-    pub y: u16,
+    pub index: usize,
+    pub x: usize,
+    pub y: usize,
 }
 
 fn parse_snake_str(snake_str: &String) -> anyhow::Result<SnakeCell> {
@@ -166,11 +201,11 @@ fn parse_snake_str(snake_str: &String) -> anyhow::Result<SnakeCell> {
     });
 }
 
-fn parse_apple_str(apple_str: &String) -> anyhow::Result<(u16, u16)> {
+fn parse_apple_str(apple_str: &String) -> anyhow::Result<(usize, usize)> {
     let parsed_apple_str = apple_str.split(',');
     let apple_list: Vec<&str> = parsed_apple_str.collect();
-    let apple_x: u16 = apple_list[0].trim().parse()?;
-    let apple_y: u16 = apple_list[1].trim().parse()?;
+    let apple_x: usize = apple_list[0].trim().parse()?;
+    let apple_y: usize = apple_list[1].trim().parse()?;
     return Ok((apple_x, apple_y));
 }
 
