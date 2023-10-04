@@ -78,11 +78,12 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
     snake_cells.sort_by_key(|cell| cell.index);
 
     let mut gen_apple_flag = false;
-
+    let mut head_x = 0;
+    let mut head_y = 0;
     for current_snake_cell in &snake_cells {
         if current_snake_cell.index == 0 { 
-            let mut head_x = current_snake_cell.x;
-            let mut head_y = current_snake_cell.y;
+            head_x = current_snake_cell.x;
+            head_y = current_snake_cell.y;
 
             match req_data.direction.as_str() {
                 "1" => {
@@ -111,21 +112,19 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
 
             }
 
-            let temp_new_head = grid[head_y].cells[head_x].clone();
-            if temp_new_head.cell_type == Some("apple".to_string()) {
-
+            if head_x == apple_x && head_y == apple_y {
                 if snake_len + 1 == usize::from(GRID_SIZE * GRID_SIZE) {
                     return app_state.render_template("htmx_snake_win.html", &req, context! { grid => grid });
                 }
+
                 gen_apple_flag = true;
                 let old_tail = snake_cells.last().unwrap();
-                let new_tail = &mut grid[old_tail.y].cells[old_tail.y];
+                println!("{:?}", old_tail);
+                let new_tail = &mut grid[old_tail.y].cells[old_tail.x];
                 new_tail.cell_type = Some("snake".to_string());
                 new_tail.snake_index = snake_len;
             }
-            else if temp_new_head.cell_type == Some("snake".to_string()) {
-                return app_state.render_template("htmx_snake_loss.html", &req, context! { grid => grid });
-            }
+            
             let new_head = &mut grid[head_y].cells[head_x];
             new_head.cell_type = Some("snake".to_string());
             new_head.snake_index = 0;
@@ -134,12 +133,14 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
             continue; 
         }
 
-        
-
         let old_snake_cell = &snake_cells[current_snake_cell.index - 1];
         let selected_grid_cell = &mut grid[old_snake_cell.y].cells[old_snake_cell.x];
         selected_grid_cell.snake_index = current_snake_cell.index;
         selected_grid_cell.cell_type = Some("snake".to_string());
+    }
+
+    if  grid[head_y].cells[head_x].snake_index != 0 {
+        return app_state.render_template("htmx_snake_loss.html", &req, context! {});
     }
 
     // Semi random apple generation
@@ -184,7 +185,7 @@ impl UsizeExtensions for usize {
     }
 }
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 struct SnakeCell {
     pub index: usize,
     pub x: usize,
