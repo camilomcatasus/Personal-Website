@@ -1,4 +1,4 @@
-<div class="lg:w-[800px] lg:h-[800px] grid grid-cols-15 grid-rows-15"
+<div class="lg:w-[800px] lg:h-[800px] grid grid-cols-15 grid-rows-15 "
 	id="gameboard"
 	hx-post="/fun-nonsense/htmx-snake/step"
 	hx-trigger="load delay:500ms" 
@@ -7,15 +7,15 @@
 	{% for row in grid %}
 		{% for cell in row.cells %}
 			{% if cell.cell_type == "snake" %}
-			<div class="bg-white">
+			<div class="bg-white border">
                 <input name="snake" type="hidden" value="{{cell.pos}}, {{cell.snake_index}}" />
 			</div>
 			{% elif cell.cell_type == "apple" %}
-			<div class="bg-amber-500">
+			<div class="bg-amber-500 border border-white">
                 <input name="apple" type="hidden" value="{{cell.pos}}" />
 			</div>
             {% else %}
-            <div>
+            <div class="border border-white">
             </div>
 			{% endif %}
 		{% endfor %}

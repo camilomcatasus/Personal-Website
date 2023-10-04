@@ -13,7 +13,6 @@ function switchKey(direction) {
 }
 
 window.onload = () => {
-        console.log("WHATS UP");
     document.addEventListener("keydown", (event) => {
         console.log(event);
         switch(event.keyCode)

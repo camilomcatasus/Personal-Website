@@ -4,15 +4,22 @@
 <script src="/static/fun_nonsense/htmx_snake.js"></script>
 <script src="/static/htmx.min.js"></script>
 <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
 {% endblock %}
 {% block content %}
-<form>
-	{% include "htmx_snake_gameboard.html" %}
-	<input id="direction" name="direction" type="hidden" value="1" />
-</form>
-<button 
-	hx-get="./reset"
-	hx-target="gameboard"
-	hx-swap="outerHTML">
-</button>
+<div class="w-full h-full flex flex-col justify-center items-center">
+    <form class="border dark:border-white">
+        <h1 class="dark:white text-3xl">Snake in htmx!</h1>
+        {% include "htmx_snake_gameboard.html" %}
+        <input id="direction" name="direction" type="hidden" value="1" />
+    </form>
+    <button 
+        class="w-32 dark:text-white h-16 border dark:border-white rounded-lg"
+        hx-get="/fun-nonsense/htmx-snake/reset"
+        hx-target="#gameboard"
+        hx-swap="outerHTML"
+        hx-ext="debug">
+        Reset Game
+    </button>
+</div>
 {% endblock %}

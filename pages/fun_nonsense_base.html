@@ -4,8 +4,12 @@
 	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
 	{% block static_files %}{% endblock %}
 	</head>
-<body class="w-screen h-screen relative transition-colors bg-white dark:bg-slate-800">
-	<div id="nav">
+<body class="w-screen h-screen relative flex transition-colors bg-white dark:bg-slate-800">
+	<div id="nav" class="md:w-60 flex flex-col dark:bg-slate-700">
+        <!--<input id="nav-search" type="text" />-->
+        <a href="/fun-nonsense/htmx-snake" class="dark:text-white">Htmx Snake</a>
 	</div>
-	{% block content %}{% endblock %}
+    <div class="grow h-full">
+	    {% block content %}{% endblock %}
+    </div>
 </body>
