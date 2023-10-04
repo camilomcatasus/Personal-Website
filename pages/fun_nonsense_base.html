@@ -2,6 +2,9 @@
 <head>
 	<title>{% block title %}{% endblock %}</title>
 	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src https:; 
+        script-src 'self' https://unpkg.com/htmx.org/dist/ext/"/>
 	{% block static_files %}{% endblock %}
 	</head>
 <body class="w-screen h-screen relative flex transition-colors bg-white dark:bg-slate-800">
