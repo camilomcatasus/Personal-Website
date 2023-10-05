@@ -671,6 +671,10 @@ video {
   width: 2rem;
 }
 
+.w-\[500px\] {
+  width: 500px;
+}
+
 .w-\[50px\] {
   width: 50px;
 }
@@ -735,6 +739,10 @@ video {
   gap: 3rem;
 }
 
+.gap-2 {
+  gap: 0.5rem;
+}
+
 .gap-4 {
   gap: 1rem;
 }
@@ -761,10 +769,6 @@ video {
 
 .rounded-lg {
   border-radius: 0.5rem;
-}
-
-.rounded-xl {
-  border-radius: 0.75rem;
 }
 
 .border {
@@ -878,6 +882,16 @@ video {
 
 .text-7xl {
   font-size: 4.5rem;
+  line-height: 1;
+}
+
+.text-xl {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+}
+
+.text-6xl {
+  font-size: 3.75rem;
   line-height: 1;
 }
 

@@ -1,0 +1,19 @@
+<html class="dark" >
+<head>
+	<title>{% block title %}{% endblock %}</title>
+	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
+    <meta http-equiv="Content-Security-Policy" content="
+    {% if env %}   default-src https:; {% endif %}
+        script-src 'self' https://unpkg.com/htmx.org/dist/ext/"/>
+	{% block static_files %}{% endblock %}
+	</head>
+<body class="w-screen h-screen relative flex transition-colors bg-white dark:bg-slate-800">
+	<div id="nav" class="md:w-60 flex flex-col dark:bg-slate-700 p-4 gap-2">
+        <!--<input id="nav-search" type="text" />-->
+        <a href="/fun-nonsense/about" class="dark:text-white">About</a>
+        <a href="/fun-nonsense/htmx-snake" class="dark:text-white">Htmx Snake | Day One</a>
+	</div>
+    <div class="w-full h-full">
+	    {% block content %}{% endblock %}
+    </div>
+</body>

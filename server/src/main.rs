@@ -143,6 +143,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(state.clone())
             .service(blurb)
             .service(fs::Files::new("/static", "./static").show_files_listing())
+            .service(fun_nonsense::fun_nonsense_about)
             .service(snake_game)
             .service(snake_reset)
             .service(snake_step)
