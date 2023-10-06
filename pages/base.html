@@ -47,7 +47,9 @@
 </head>
 <body class="w-screen h-screen overflow-x-hidden overflow-y-scroll relative transition-colors bg-white dark:bg-slate-800">
 	<div id="dashboard-section" class="relative h-screen h-full overflow-y-visible ">
-		<div class="absolute top-0 flex gap-4 right-0 h-32 w-32 pt-4 pr-4">
+        <div class="absolute top-0">
+        </div>
+		<div class="absolute top-0 flex gap-4 right-0 h-64 w-64 pt-4 pr-4">
             <a href="https://linkedin.com/camilomcatasus">
                 
             </a>
@@ -64,7 +66,7 @@
 					Welcome to my website...
 				</h1>
                 <div id="landing-page-grid" class="absolute grid inset-0 p-8 auto-cols-[250px] auto-rows-[100px]"
-                    hx-trigger="every[checkDashVisible()] 2s"
+                    hx-trigger="every 2s"
                     hx-post="/api/blurb"
                     hx-swap="beforeend"
                     hx-vals="js:{displayed_rects: getRects(), grid_h: getGridHeight(), grid_w: getGridWidth()}"

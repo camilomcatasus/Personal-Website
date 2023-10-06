@@ -8,7 +8,7 @@ function displayText(sender, sentText) {
     }
     var index = 1;
     var consoleTyper = setInterval(function() {
-        
+        //TODO: look for display-box attribute
         sender.firstElementChild.innerHTML = text.substring(0, index);
         if(text.length <= index)
         {
