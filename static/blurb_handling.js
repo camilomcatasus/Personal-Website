@@ -8,8 +8,7 @@ function displayText(sender, sentText) {
     }
     var index = 1;
     var consoleTyper = setInterval(function() {
-        //TODO: look for display-box attribute
-        sender.firstElementChild.innerHTML = text.substring(0, index);
+        sender.querySelector("[display-box]").innerHTML = text.substring(0, index);
         if(text.length <= index)
         {
             sender.classList.add("opacity-0");
@@ -73,5 +72,6 @@ function getRects() {
 htmx.onLoad((elt) => {
     if(elt.getAttribute("api-text")) {
         displayText(elt);
+        elt.querySelector("button").onclick = () => elt.remove();
     }
 });

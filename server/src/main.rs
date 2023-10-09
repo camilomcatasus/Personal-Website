@@ -31,9 +31,9 @@ struct RectPos {
 const BLURB_WIDTH: usize = 250;
 const BLURB_HEIGHT: usize = 100;
 const COLORS: &'static [&str] = &[
-    "dark:text-amber-200 text-amber-500",
-    "dark:text-lime-200 text-lime-500",
-    "dark:text-green-300 text-green-500",
+    "dark:text-amber-200 text-amber-600",
+    "dark:text-lime-200 text-lime-600",
+    "dark:text-green-300 text-green-600",
     "dark:text-emerald-300 text-emerald-600",
     "dark:text-teal-200 text-teal-600",
     "dark:text-cyan-200 text-cyan-600",
@@ -99,6 +99,7 @@ async fn blurb(app_state: web::Data<AppState>, req_data: web::Json<BlurbRequestD
         Err(err) => {
             println!("Response Error: {}", err);
             return app_state.render_template("blurb.html", &req, context! {
+                text_color => "dark:text-red-200 text-red-600",
                 x => choice.col,
                 y => choice.row,
                 inner_text => "An error occurred while making the API request",

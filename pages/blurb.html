@@ -1,9 +1,15 @@
-<div class="transition-opacity duration-[4000ms] hover:opacity-100 hover:durationhttps://todomvc.com/examples/mithril/#/-[500ms] h-fit group w-[250px] max-h-[100px] grid-item relative p-2 
-    border dark:border-white border-black dark:border bg-slate-900 m-1 overflow-hidden"
+<div class="transition-opacity duration-[4000ms] hover:opacity-100 hover:duration-[500ms] 
+    flex flex-col h-[150px] group w-[250px] max-h-[150px] grid-item relative
+    border dark:border-white border-cyan-600 dark:border bg-slate-50 dark:bg-slate-900 m-1 overflow-hidden"
     api-text="{{ inner_text }}"
     style="grid-row: {{ y }}; grid-column: {{ x }};"
     x="{{x}}" y="{{y}}"> 
-    <div display-box class="w-full h-fit {{ text_color }}">
+    <div class="w-full h-8 flex flex-row-reverse bg-cyan-600 dark:bg-slate-50 p-1 items-center">
+        <button class="h-[1.6rem] w-[1.6rem] bg-red-500 text-center leading-[1.6rem]" >
+            x
+        </button>
+    </div>
+    <div display-box class="w-full h-full {{ text_color }} p-2 overflow-y-auto">
     </div>
 	<div class="absolute top-full hidden group-hover:block rounded dark:text-white flex flex-col bg-slate-850 p-4 left-0 rounded-lg">
         {{ help_text|safe }}
