@@ -19,7 +19,7 @@
 {% from 'svg_macros.html' import githubIcon, linkedinIcon %}
 <!doctype html>
 <html class="dark" >
-<head >
+<head>
 	<title>Yurts are awesome</title>
 	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
 	<style>
@@ -39,41 +39,34 @@
             else
                 documentClass.add("dark");
         }
-
-        function checkDashVisible() {
-        }
-
 	</script>
 </head>
 <body class="w-screen h-screen overflow-x-hidden overflow-y-scroll relative transition-colors bg-white dark:bg-slate-800">
-	<div id="dashboard-section" class="relative h-screen h-full overflow-y-visible ">
-        <div class="absolute top-0">
-        </div>
-		<div class="absolute top-0 flex gap-4 right-0 h-64 w-64 pt-4 pr-4">
+    <div id="dashboard-section" class="h-screen w-full flex flex-col relative">
+        <div class="flex flex-row-reverse gap-4 right-0 w-full p-4">
             <a href="https://linkedin.com/camilomcatasus">
-                
             </a>
             <a href="https://github.com/camilomcatasus">
                 {{ githubIcon() }}
             </a>
-			{{ toggle() }}
-		</div>
-		<div id="landing-page" class="h-screen w-full justify-center items-center flex relative p-4">
-				<h1 id="welcome-text" 
-					class="dark:text-white text-7xl" >
-					I'm Camilo,
-					<br/>
-					Welcome to my website...
-				</h1>
-                <div id="landing-page-grid" class="absolute grid inset-0 p-8 auto-cols-[250px] auto-rows-[150px]"
-                    hx-trigger="every 2s"
-                    hx-post="/api/blurb"
-                    hx-swap="beforeend"
-                    hx-vals="js:{displayed_rects: getRects(), grid_h: getGridHeight(), grid_w: getGridWidth()}"
-                    hx-ext="json-enc">
-                </div>
-		</div>
-	</div>
+            {{ toggle() }}
+        </div>
+        <div class="w-full grow">
+            <h1 id="welcome-text" 
+                class="dark:text-white text-4xl lg:text-7xl" >
+                I'm Camilo,
+                <br/>
+                Welcome to my website...
+            </h1>
+            <div id="landing-page-grid" class="absolute grid inset-0 p-8 auto-cols-[250px] auto-rows-[150px]"
+                hx-trigger="every 2s"
+                hx-post="/api/blurb"
+                hx-swap="beforeend"
+                hx-vals="js:{displayed_rects: getRects(), grid_h: getGridHeight(), grid_w: getGridWidth()}"
+                hx-ext="json-enc">
+            </div>
+        </div>
+    </div>
     <div id="projects-section"
         class="w-full p-20 flex flex-col gap-12 items-center justify-center">
         <div>
