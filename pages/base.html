@@ -46,18 +46,19 @@
 	</script>
 </head>
 <body class="w-screen h-screen overflow-x-hidden overflow-y-scroll relative transition-colors bg-white dark:bg-slate-800">
-	<div id="dashboard-section" class="relative h-screen h-full overflow-y-visible ">
+	<div id="dashboard-section" class="relative h-screen overflow-y-visible ">
         <div class="absolute top-0">
         </div>
 		<div class="absolute top-0 flex gap-4 right-0 h-64 w-64 pt-4 pr-4">
             <a href="https://linkedin.com/camilomcatasus">
-                
+                {{ linkedinIcon() }}
             </a>
             <a href="https://github.com/camilomcatasus">
                 {{ githubIcon() }}
             </a>
 			{{ toggle() }}
 		</div>
+        {% if variant == "default" %}
 		<div id="landing-page" class="h-screen w-full justify-center items-center flex relative p-4">
 				<h1 id="welcome-text" 
 					class="dark:text-white text-7xl" >
@@ -73,6 +74,10 @@
                     hx-ext="json-enc">
                 </div>
 		</div>
+        {% elif variant == "chat" %}
+        {% include "landing_variants/chat_variant.html" %}
+        {% endif %}
+
 	</div>
     <div id="projects-section"
         class="w-full p-20 flex flex-col gap-12 items-center justify-center">
