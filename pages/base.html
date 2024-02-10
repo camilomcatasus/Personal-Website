@@ -1,5 +1,5 @@
 {% macro toggle() %}
-	<div class="h-12 w-24 rounded-3xl border border-color border-[3px] transition-colors border-rose-400 dark:border-rose-300 
+	<div class="h-12 w-24 rounded-3xl border border-color border-[3px] transition-colors border-rose-400 dark:border-rose-300
 		flex items-center px-1 z-50
 		cursor-pointer relative"
 		onclick="toggle(this);">
@@ -10,7 +10,7 @@
 					fa-solid fa-sun fa-lg"></i>
 			</div>
 			<div class="dark:flex hidden w-full h-full place-content-center left-4">
-				<i class="justify-center items-center w-full h-full 
+				<i class="justify-center items-center w-full h-full
 					fa-solid fa-moon fa-lg"></i>
 			</div>
 		</div>
@@ -19,7 +19,7 @@
 {% from 'svg_macros.html' import githubIcon, linkedinIcon %}
 <!doctype html>
 <html class="dark" >
-<head >
+<head>
 	<title>Yurts are awesome</title>
 	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
 	<style>
@@ -39,10 +39,6 @@
             else
                 documentClass.add("dark");
         }
-
-        function checkDashVisible() {
-        }
-
 	</script>
 </head>
 <body class="w-screen h-screen overflow-x-hidden overflow-y-scroll relative transition-colors bg-white dark:bg-slate-800">
@@ -60,7 +56,7 @@
 		</div>
         {% if variant == "default" %}
 		<div id="landing-page" class="h-screen w-full justify-center items-center flex relative p-4">
-				<h1 id="welcome-text" 
+				<h1 id="welcome-text"
 					class="dark:text-white text-7xl" >
 					I'm Camilo,
 					<br/>
@@ -83,7 +79,7 @@
         class="w-full p-20 flex flex-col gap-12 items-center justify-center">
         <div>
             <h2 class="w-full text-3xl md:text-5xl dark:text-white pb-8 underline underline-offset-8">
-                Things I've worked on 
+                Things I've worked on
             </h2>
             <div class="flex flex-wrap w-[200px] h-[600px] md:w-[750px] md:h-[250px] lg:w-[900px] lg:h-[300px] xl:w-[1050px] xl:h-[350px]">
                 {% for project in serious_projects %}
@@ -99,7 +95,7 @@
                                 {{ project.information }}
                             </div>
                         </div>
-                    </div>            
+                    </div>
                 {% endfor %}
             </div>
         </div>
@@ -121,7 +117,7 @@
                                 {{ project.information }}
                             </div>
                         </div>
-                    </div>            
+                    </div>
                 {% endfor %}
             </div>
         </div>
