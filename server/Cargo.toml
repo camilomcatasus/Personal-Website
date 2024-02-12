@@ -27,3 +27,5 @@ models = { path = "../models" }
 rand = "0.8.5"
 chrono = "0.4.29"
 env_logger = "0.10.0"
+shuttle-actix-web = "0.38.0"
+shuttle-runtime = "0.38.0"

@@ -1,15 +1,10 @@
-{% extends "fun_nonsense/fun_nonsense_base.html" %}
-{% block title %} Snake in HTMX! {% endblock %}
-{% block static_files %}
-<script src="/static/fun_nonsense/htmx_snake.js"></script>
-<script src="/static/htmx.min.js"></script>
-<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-<script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
-{% endblock %}
-{% block content %}
+{% block section %}
+{% if boosted %}
+<title>Snake in HTMX!</title>
+{% endif %}
 <div class="w-full h-full flex flex-col justify-center items-center">
     <form class="">
-        <h1 class="dark:white text-3xl">Snake in htmx!</h1>
+        <h1 class="dark:text-white text-3xl">Snake in htmx!</h1>
         {% include "fun_nonsense/htmx_snake/htmx_snake_gameboard.html" %}
         <input id="direction" name="direction" type="hidden" value="1" />
     </form>

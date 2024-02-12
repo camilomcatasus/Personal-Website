@@ -13,14 +13,11 @@ pub struct AppState {
 }
 
 impl AppState {
-    pub fn render_template(&self, name: &str, req: &HttpRequest, ctx: Value) -> HttpResponse {
-        with_bound_req(req, || {
-            let tmpl = self.env.get_template(name).unwrap();
-            let rv = tmpl.render(ctx).unwrap();
-            HttpResponse::Ok()
-                .content_type(ContentType ::html())
-                .body(rv)
-        })
+    pub fn render_template(&self, name: &str, ctx: Value) -> HttpResponse {
+        let tmpl = self.env.get_template(name).unwrap(); let rv = tmpl.render(ctx).unwrap();
+        HttpResponse::Ok()
+            .content_type(ContentType ::html())
+            .body(rv)
     }
 }
 
@@ -45,21 +42,4 @@ pub struct ResponseObject {
     pub inner_text: String,
     pub help_text: Option<String>,
     pub url: String
-}
-
-thread_local! {
-    static CURRENT_REQUEST: RefCell<Option<HttpRequest>> = RefCell::default()
-}
-
-fn with_bound_req<F, R>(req: &HttpRequest, f: F) -> R
-where 
-    F: FnOnce() -> R, 
-{
-    CURRENT_REQUEST.with(|current_req| *current_req.borrow_mut() = Some(req.clone()));
-    let rv = std::panic::catch_unwind(std::panic::AssertUnwindSafe(f));
-    CURRENT_REQUEST.with(|current_req| current_req.borrow_mut().take());
-    match rv {
-        Ok(rv) => rv,
-        Err(panic) => std::panic::resume_unwind(panic),
-    }
 }

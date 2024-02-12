@@ -4,6 +4,8 @@ use serde::{Serialize, Deserialize};
 use minijinja::context;
 use models::AppState;
 
+use crate::fun_nonsense::render_boosted;
+
 const GRID_SIZE: usize = 15;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -49,11 +51,11 @@ fn generate_empty_grid() -> Vec<Row> {
 
 #[get("/fun-nonsense/htmx-snake")]
 pub async fn snake_game(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake.html", &req, context! { grid => get_new_grid() });
+    return render_boosted(&app_state, &req, "fun_nonsense/htmx_snake", context! {});
 }
 
 #[post("/fun-nonsense/htmx-snake/step")]
-pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<SnakeResponse>, req: HttpRequest) -> HttpResponse {
+pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<SnakeResponse>) -> HttpResponse {
     let mut grid = generate_empty_grid();
 
     let (mut apple_x, mut apple_y) = match parse_apple_str(&req_data.apple) {
@@ -114,7 +116,7 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
 
             if head_x == apple_x && head_y == apple_y {
                 if snake_len + 1 == usize::from(GRID_SIZE * GRID_SIZE) {
-                    return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_win.html", &req, context! { grid => grid });
+                    return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_win.html", context! { grid => grid });
                 }
 
                 gen_apple_flag = true;
@@ -140,7 +142,7 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
     }
 
     if  grid[head_y].cells[head_x].snake_index != 0 {
-        return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_loss.html", &req, context! {});
+        return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_loss.html", context! {});
     }
 
     // Semi random apple generation
@@ -167,7 +169,7 @@ pub async fn snake_step(app_state: web::Data<AppState>, req_data: web::Json<Snak
     }
 
     grid[apple_y].cells[apple_x].cell_type = Some("apple".to_string());
-    return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_gameboard.html", &req, context! { grid => grid });
+    return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_gameboard.html", context! { grid => grid });
 }
 
 trait UsizeExtensions {
@@ -228,6 +230,6 @@ fn get_new_grid() -> Vec<Row> {
 }
 
 #[get("/fun-nonsense/htmx-snake/reset")]
-pub async fn snake_reset(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_gameboard.html", &req, context! { grid => get_new_grid() });
+pub async fn snake_reset(app_state: web::Data<AppState>) -> HttpResponse {
+    return app_state.render_template("fun_nonsense/htmx_snake/htmx_snake_gameboard.html", context! { grid => get_new_grid() });
 }

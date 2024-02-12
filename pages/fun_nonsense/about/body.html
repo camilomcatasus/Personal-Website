@@ -1,8 +1,8 @@
-{% extends "fun_nonsense/fun_nonsense_base.html" %}
-{% block title %} About Fun Nonsense {% endblock %}
-{% block static_files %}
-{% endblock %}
-{% block content %}
+{% block section %}
+{% if boosted %}
+<title>Why am I Here?</title>
+{% endif %}
+<div class="w-full flex flex-col items-center">
 <div class="w-[800px] p-8">
     <h1 class="text-6xl dark:text-white"> About Fun Nonsense </h1>
     <br/>
@@ -31,5 +31,6 @@
     Just spend the time you are devoting to practice being introspective about how you perform. 
     I want to spend time doing that here, write some one off weekend projects, and review my output.
     </p>
+</div>
 </div>
 {% endblock %}
