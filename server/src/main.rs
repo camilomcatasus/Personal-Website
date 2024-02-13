@@ -33,16 +33,15 @@ async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clon
     let request_cache: HashMap<RequestObject, CacheObject> = HashMap::new();
     let state = web::Data::new(AppState { env, request_cache: Mutex::new(request_cache) });
 
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    //env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
 
     let config = move |cfg: & mut ServiceConfig| {
-        cfg.service(web::scope("/").wrap(Logger::default())
-            .app_data(state.clone())
+            cfg.app_data(state.clone())
             .service(fs::Files::new("/static", "./static").show_files_listing())
             .service(fun_nonsense::fun_nonsense_about)
             .service(snake_game)
             .service(snake_reset)
-            .service(snake_step));
+            .service(snake_step);
             //.service(page)
     };
 
