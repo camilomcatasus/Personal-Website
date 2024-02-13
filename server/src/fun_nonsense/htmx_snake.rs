@@ -51,7 +51,7 @@ fn generate_empty_grid() -> Vec<Row> {
 
 #[get("/fun-nonsense/htmx-snake")]
 pub async fn snake_game(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    return render_boosted(&app_state, &req, "fun_nonsense/htmx_snake", context! {});
+    return render_boosted(&app_state, &req, "fun_nonsense/htmx_snake", context! { grid => get_new_grid() });
 }
 
 #[post("/fun-nonsense/htmx-snake/step")]
