@@ -1,4 +1,3 @@
-mod endpoints;
 mod fun_nonsense;
 
 use std::fs::File;
