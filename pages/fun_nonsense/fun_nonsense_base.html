@@ -8,16 +8,21 @@
     <script src="/static/fun_nonsense.js"></script>
 	</head>
 <body class="w-screen h-screen relative flex transition-colors bg-white dark:bg-slate-800">
-	<div 
-        id="nav" 
-        class="md:w-60 flex flex-col dark:bg-slate-700 p-4 gap-2" 
-        hx-boost="true"
-        hx-target="#boost-container">
-        <!--<input id="nav-search" type="text" />-->
-        <a href="/fun-nonsense/about" class="dark:text-white">About</a>
-        <a href="/fun-nonsense/htmx-snake" class="dark:text-white">Htmx Snake</a>
+    <button class="w-16 h-16 absolute bottom-4 left-4 block sm:hidden">
+
+    </button>
+    <div class="sm:w-60 w-0 h-full transition-[width] shrink-0 grow-0 absolute sm:static overflow-x-hidden">
+        <div 
+            id="nav" 
+            class="flex flex-col dark:bg-slate-700 p-4 gap-2 h-full w-60 dark:text-white" 
+            hx-boost="true"
+            hx-target="#boost-container">
+            <!--<input id="nav-search" type="text" />-->
+            <a href="/fun-nonsense/about" class="">About</a>
+            <a href="/fun-nonsense/htmx-snake" class="dark:text-white">Htmx Snake</a>
+	    </div>
 	</div>
-    <div id="boost-container" class="w-full h-full">
+    <div id="boost-container" class="w-full h-full overflow-auto grow">
 	    {% block content %}{% endblock %}
     </div>
 </body>
