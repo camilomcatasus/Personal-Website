@@ -812,6 +812,10 @@ video {
   width: 100vw;
 }
 
+.max-w-\[800px\] {
+  max-width: 800px;
+}
+
 .flex-shrink {
   flex-shrink: 1;
 }
@@ -1198,6 +1202,10 @@ video {
 @media (min-width: 640px) {
   .sm\:static {
     position: static;
+  }
+
+  .sm\:hidden {
+    display: none;
   }
 
   .sm\:w-60 {
