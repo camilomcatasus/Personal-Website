@@ -41,8 +41,8 @@ async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clon
             .service(fun_nonsense::fun_nonsense_about)
             .service(snake_game)
             .service(snake_reset)
-            .service(snake_step);
-            //.service(page)
+            .service(snake_step)
+            .service(page);
     };
 
     return Ok(config.into());

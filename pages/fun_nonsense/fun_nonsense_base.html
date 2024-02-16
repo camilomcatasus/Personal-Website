@@ -1,28 +1,41 @@
 <html class="dark" >
 <head>
 	<title>{% block title %}{% endblock %}</title>
+    <link href="/static/hamburgers.min.css" rel="stylesheet" type="text/css" />
 	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
     <script src="/static/htmx.min.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
     <script src="/static/fun_nonsense.js"></script>
-	</head>
-<body class="w-screen h-screen relative flex transition-colors bg-white dark:bg-slate-800">
-    <button class="w-16 h-16 absolute bottom-4 left-4 block sm:hidden">
-
-    </button>
-    <div class="sm:w-60 w-0 h-full transition-[width] shrink-0 grow-0 absolute sm:static overflow-x-hidden">
-        <div 
-            id="nav" 
-            class="flex flex-col dark:bg-slate-700 p-4 gap-2 h-full w-60 dark:text-white" 
-            hx-boost="true"
-            hx-target="#boost-container">
-            <!--<input id="nav-search" type="text" />-->
-            <a href="/fun-nonsense/about" class="">About</a>
-            <a href="/fun-nonsense/htmx-snake" class="dark:text-white">Htmx Snake</a>
-	    </div>
-	</div>
-    <div id="boost-container" class="w-full h-full overflow-auto grow">
-	    {% block content %}{% endblock %}
+</head>
+<body class="flex flex-col relative w-screen h-screen bg-white transition-colors drop-shadow dark:bg-slate-900 overflow-hidden">
+    <div class="flex h-12 w-full shrink-0 grow-0 dark:bg-slate-950 text-white px-4 items-center gap-3"
+        hx-target="#section-boost-container">
+        <a href="/hello-world">Hello World?</a>
+        <a href="/fun-nonsense">Fun Nonsense</a>
+    </div>
+    <div id="section-boost-container" class="flex grow h-0 w-full relative">
+        <div class="absolute w-0 h-full sm:relative sm:w-60 transition-[width] shrink-0 grow-0 top-0 bottom-0">
+            <div 
+                id="secondary-nav" 
+                class="flex overflow-x-hidden flex-col gap-2 py-4 w-0 h-full sm:w-60 dark:text-white transition-[width] drop-shadow-md sm:dark:bg-slate-900 dark:bg-slate-850" 
+                hx-boost="true"
+                hx-target="#boost-container">
+                <!--<input id="nav-search" type="text" />-->
+                {% for route in routes %}
+                <a href="{{route.path}}" class="px-4 w-60">{{route.text}}</a>
+                {% endfor %}
+            </div>
+            <div class="flex absolute bottom-4 -right-12 justify-center items-center w-12 h-12 rounded-r-xl sm:hidden dark:text-white drop-shadow-md dark:bg-slate-700">
+                <button id="toggle-nav-button" class="hamburger hamburger--arrow scale-[0.6]" type="button">
+                    <span class="hamburger-box">
+                        <span class="dark:bg-white hamburger-inner"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+        <div id="boost-container" class="flex overflow-y-auto w-full h-full grow">
+            {% block content %}{% endblock %}
+        </div>
     </div>
 </body>
