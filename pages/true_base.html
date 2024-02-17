@@ -1,0 +1,21 @@
+<html class="dark" >
+<head>
+	<title>{% block title %}{% endblock %}</title>
+    <link href="/static/hamburgers.min.css" rel="stylesheet" type="text/css" />
+	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
+    <script src="/static/htmx.min.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
+    <script src="/static/fun_nonsense.js"></script>
+</head>
+<body class="flex flex-col relative w-screen h-screen bg-white transition-colors drop-shadow dark:bg-slate-900 overflow-hidden">
+    <div class="flex h-12 w-full shrink-0 grow-0 dark:bg-slate-950 text-white px-4 items-center gap-3"
+        hx-target="#section-boost-container">
+        <a href="/hello-world">Hello World?</a>
+        <a href="/fun-nonsense">Fun Nonsense</a>
+    </div>
+    <div id="section-boost-container" class="flex grow h-0 w-full relative">
+    {% block main_section %}
+    {% endblock %}
+    </div>
+</body>
