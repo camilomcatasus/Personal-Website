@@ -17,7 +17,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'fun_nonsense.js',
+    filename: 'main.js',
     path: path.resolve(__dirname, '../static'),
   },
 };

@@ -35,8 +35,8 @@ function sectionSetup() {
                 break;
         }
     }
-}
 
+}
 
 window.onload = () => {
     document.onkeydown = (event: KeyboardEvent) => {
