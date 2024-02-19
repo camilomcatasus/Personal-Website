@@ -1,15 +1,13 @@
 mod fun_nonsense;
+mod hello_world;
 
-use std::fs::File;
-use std::io::BufReader;
 use std::sync::Mutex;
 use actix_files as fs;
 use serde::{ Serialize, Deserialize };
-use actix_web::{web::{ServiceConfig, self}, get, App, HttpServer, HttpRequest, HttpResponse, middleware::Logger};
-use minijinja::{path_loader, Environment, context};
+use actix_web::{web::{ServiceConfig, self}, get, HttpRequest, HttpResponse};
+use minijinja::{path_loader, Environment, context, Value};
 use std::collections::HashMap;
 use models::{AppState, RequestObject, CacheObject};
-use fun_nonsense::htmx_snake::{snake_step, snake_reset, snake_game};
 use shuttle_actix_web::ShuttleActixWeb;
 
 #[derive(Serialize, Deserialize)]
@@ -38,12 +36,20 @@ async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clon
     let config = move |cfg: & mut ServiceConfig| {
             cfg.app_data(state.clone())
             .service(fs::Files::new("/static", "./static").show_files_listing())
-            .service(fun_nonsense::fun_nonsense_about)
-            .service(snake_game)
-            .service(snake_reset)
-            .service(snake_step)
+            .configure(fun_nonsense::config)
+            .configure(hello_world::config)
             .service(page);
     };
 
     return Ok(config.into());
+}
+
+pub fn render_boosted(app_state: &web::Data<AppState>, req: &HttpRequest, dir_path: &str, ctx: Value) -> HttpResponse {
+    let boosted = req.headers().get("HX-Request").is_some();
+    let correct_path = match req.headers().get("HX-Request") {
+        Some(_) => format!("{}/body.html", dir_path),
+        None => format!("{}/page.html", dir_path),
+    };
+
+    app_state.render_template(&correct_path, context! { ..ctx, ..context!{boosted => boosted} })
 }

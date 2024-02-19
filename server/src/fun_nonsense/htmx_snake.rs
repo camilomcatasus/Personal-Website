@@ -8,6 +8,12 @@ use crate::fun_nonsense::render_boosted;
 
 const GRID_SIZE: usize = 15;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(snake_game)
+        .service(snake_step)
+        .service(snake_reset);
+}
+
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct Row {
     cells: Vec<Cell>
