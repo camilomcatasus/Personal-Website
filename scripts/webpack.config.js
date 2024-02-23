@@ -2,7 +2,10 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-  entry: './main.ts',
+  entry: {
+        main:'./main/main.ts',
+        htmx_snake:'./htmx_snake/htmx_snake.ts',
+  },
   devtool: 'inline-source-map',
   module: {
     rules: [
@@ -17,7 +20,7 @@ module.exports = {
     extensions: ['.tsx', '.ts', '.js'],
   },
   output: {
-    filename: 'main.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, '../static'),
   },
 };

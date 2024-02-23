@@ -1,4 +1,5 @@
 mod fun_nonsense;
+mod serious_series;
 mod hello_world;
 
 use std::sync::Mutex;
@@ -38,6 +39,7 @@ async fn main() -> ShuttleActixWeb<impl FnOnce(&mut ServiceConfig) + Send + Clon
             .service(fs::Files::new("/static", "./static").show_files_listing())
             .configure(fun_nonsense::config)
             .configure(hello_world::config)
+            .configure(serious_series::config)
             .service(page);
     };
 

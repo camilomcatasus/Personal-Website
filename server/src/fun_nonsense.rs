@@ -11,12 +11,12 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 #[get("/fun-nonsense/about")]
 pub async fn fun_nonsense_about(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    return render_boosted(&app_state, 
+    return render_fun_boosted(&app_state, 
                           &req,
                           "fun_nonsense/about", context! {  });
 }
 
-pub fn render_boosted(app_state: &web::Data<AppState>, req: &HttpRequest, dir_path: &str, ctx: Value) -> HttpResponse {
+pub fn render_fun_boosted(app_state: &web::Data<AppState>, req: &HttpRequest, dir_path: &str, ctx: Value) -> HttpResponse {
 
     let routes: Vec<Route> = vec![
         Route { path: "/fun-nonsense/about", text:"About" },

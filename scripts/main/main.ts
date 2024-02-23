@@ -1,6 +1,3 @@
-import { snakeKeyDownHandler } from "./htmx_snake";
-
-
 function toggleClass(elem: HTMLElement, class1: string, class2: string) {
     if (elem.classList.contains(class1))
     {
@@ -16,12 +13,12 @@ function toggleClass(elem: HTMLElement, class1: string, class2: string) {
 
 function secondaryNavLoaded(path:string) {
     let nav = document.getElementById("secondary-nav");
-    let allNavItems = nav.querySelectorAll("a");
+    let allNavItems = nav!.querySelectorAll("a");
     allNavItems.forEach((navItem) => {
         navItem.classList.remove("underline");
     })
 
-    let selectedAnchor = nav.querySelector(`a[href="${path}"]`) as HTMLElement;
+    let selectedAnchor = nav!.querySelector(`a[href="${path}"]`) as HTMLElement;
     selectedAnchor.classList.add("underline");
 }
 
@@ -39,22 +36,19 @@ function sectionSetup() {
 }
 
 window.onload = () => {
-    document.onkeydown = (event: KeyboardEvent) => {
-        snakeKeyDownHandler(event);
-    }
 
     document.onclick = (event: Event) => {
         let target = event.target as HTMLElement;
         if (target.matches(":is(#toggle-nav-button, #toggle-nav-button *)")) {
-            let secondaryNav = document.getElementById("secondary-nav");
-            let parent = secondaryNav.parentElement;
+            let secondaryNav = document.getElementById("secondary-nav") as HTMLElement;
+            let parent = secondaryNav.parentElement as HTMLElement;
             toggleClass(secondaryNav, "w-0", "w-60");
             toggleClass(parent, "w-0", "w-60");
             
-            document.getElementById("toggle-nav-button").classList.toggle("is-active");
+            document.getElementById("toggle-nav-button")!.classList.toggle("is-active");
         }
         else if (target.matches("#secondary-nav > a")) {
-            secondaryNavLoaded(target.getAttribute("href"));
+            secondaryNavLoaded(target.getAttribute("href")!);
         }
     }
 

@@ -1,0 +1,14 @@
+{% block section %}
+<div class="w-full h-full flex items-center justify-center">
+    <div class="w-full lg:w-[850px] lg:h-[400px] flex flex-row flex-wrap overflow-y-auto">
+    {% for project in projects %}
+        <div class="w-full sm:w-1/2 lg:w-1/4 group overflow-hidden relative"> 
+            <img src="{{project.source}}" class="absolute inset-0 object-contain">
+            <div class="absolute translate-y-full group-hover:translate-y-0 transition-transform
+                inset-0 bg-slate-500 opacity-50">
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

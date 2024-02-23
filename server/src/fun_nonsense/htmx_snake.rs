@@ -4,12 +4,13 @@ use serde::{Serialize, Deserialize};
 use minijinja::context;
 use models::AppState;
 
-use crate::fun_nonsense::render_boosted;
+use crate::fun_nonsense::render_fun_boosted;
 
 const GRID_SIZE: usize = 15;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(snake_game)
+        .service(snake_page)
         .service(snake_step)
         .service(snake_reset);
 }
@@ -52,12 +53,17 @@ fn generate_empty_grid() -> Vec<Row> {
         grid.push(row);
     }
 
-    return grid;
+    grid
+}
+
+#[get("/real-page/htmx-snake")]
+pub async fn snake_game(app_state: web::Data<AppState>) -> HttpResponse {
+    app_state.render_template("fun_nonsense/htmx_snake/real_page.html", context! { grid => get_new_grid() } )
 }
 
 #[get("/fun-nonsense/htmx-snake")]
-pub async fn snake_game(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    return render_boosted(&app_state, &req, "fun_nonsense/htmx_snake", context! { grid => get_new_grid() });
+pub async fn snake_page(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
+    return render_fun_boosted(&app_state, &req, "fun_nonsense/htmx_snake", context! {  });
 }
 
 #[post("/fun-nonsense/htmx-snake/step")]
@@ -203,11 +209,11 @@ struct SnakeCell {
 fn parse_snake_str(snake_str: &String) -> anyhow::Result<SnakeCell> {
     let parsed_snake_item = snake_str.split(',');
     let snake_item_list: Vec<&str> = parsed_snake_item.collect();
-    return Ok(SnakeCell {
+    Ok(SnakeCell {
         x: snake_item_list[0].trim().parse()?,
         y: snake_item_list[1].trim().parse()?,
         index: snake_item_list[2].trim().parse()?
-    });
+    })
 }
 
 fn parse_apple_str(apple_str: &String) -> anyhow::Result<(usize, usize)> {
@@ -215,7 +221,7 @@ fn parse_apple_str(apple_str: &String) -> anyhow::Result<(usize, usize)> {
     let apple_list: Vec<&str> = parsed_apple_str.collect();
     let apple_x: usize = apple_list[0].trim().parse()?;
     let apple_y: usize = apple_list[1].trim().parse()?;
-    return Ok((apple_x, apple_y));
+    Ok((apple_x, apple_y))
 }
 
 fn get_new_grid() -> Vec<Row> {
@@ -232,7 +238,7 @@ fn get_new_grid() -> Vec<Row> {
 
     grid[apple_start_y].cells[apple_start_x].cell_type = Some("apple".to_string());
     
-    return grid;
+    grid
 }
 
 #[get("/fun-nonsense/htmx-snake/reset")]
