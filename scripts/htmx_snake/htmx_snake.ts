@@ -36,14 +36,14 @@ window.onload = () => {
     let focusBlurDiv = document.getElementById("focus-blur");
 
 
-    window.addEventListener("focusout", (event) => {
+    window.addEventListener("blur", (event) => {
         console.log(event);
         if(!document.hasFocus()) {
             focusBlurDiv!.classList.remove("hidden");
         }
     });
 
-    window.addEventListener("focusin", (event) => {
+    window.addEventListener("focus", (event) => {
         console.log(event);
         if(document.hasFocus()) {
             focusBlurDiv!.classList.add("hidden");
