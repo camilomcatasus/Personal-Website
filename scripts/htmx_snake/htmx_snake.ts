@@ -50,6 +50,9 @@ window.onload = () => {
         }
     });
 
+    if(document.hasFocus()) {
+        focusBlurDiv!.classList.remove("hidden");
+    }
 
     setInterval(() => {
         if(document.hasFocus()) {
