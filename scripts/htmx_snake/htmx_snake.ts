@@ -51,6 +51,9 @@ window.onload = () => {
     });
 
     if(document.hasFocus()) {
+        focusBlurDiv!.classList.add("hidden");
+    }
+    else {
         focusBlurDiv!.classList.remove("hidden");
     }
 
