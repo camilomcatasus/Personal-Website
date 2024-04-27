@@ -11,7 +11,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 
-#[get("/hello_world")]
+#[get("/hello-world")]
 async fn hello_world(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
     return crate::render_boosted(&app_state, &req, "hello_world", context! {});
 }
@@ -23,12 +23,12 @@ struct Blurb {
 
 
 //TODO: Implement redis and cache all blurbs
-#[get("/hello_world/blurb")]
+#[get("/hello-world/blurb")]
 async fn blurb(_app_state: web::Data<AppState>, _req: HttpRequest) -> HttpResponse {
     return HttpResponse::Ok().json(Blurb {});
 }
 
-#[get("/hello_world/chat")]
+#[get("/hello-world/chat")]
 async fn chat(_req: HttpRequest) -> HttpResponse {
     return HttpResponse::Ok().body("");
 }

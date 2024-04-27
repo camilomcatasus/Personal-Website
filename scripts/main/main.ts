@@ -35,24 +35,19 @@ function sectionSetup() {
 
 }
 
-window.onload = () => {
-
-    document.onclick = (event: Event) => {
-        let target = event.target as HTMLElement;
-        if (target.matches(":is(#toggle-nav-button, #toggle-nav-button *)")) {
-            let secondaryNav = document.getElementById("secondary-nav") as HTMLElement;
-            let parent = secondaryNav.parentElement as HTMLElement;
-            toggleClass(secondaryNav, "w-0", "w-60");
-            toggleClass(parent, "w-0", "w-60");
-            
-            document.getElementById("toggle-nav-button")!.classList.toggle("is-active");
-        }
-        else if (target.matches("#secondary-nav > a")) {
-            secondaryNavLoaded(target.getAttribute("href")!);
-        }
+document.onclick = (event: Event) => {
+    let target = event.target as HTMLElement;
+    if (target.matches(":is(#toggle-nav-button, #toggle-nav-button *)")) {
+        let secondaryNav = document.getElementById("secondary-nav") as HTMLElement;
+        let parent = secondaryNav.parentElement as HTMLElement;
+        toggleClass(secondaryNav, "w-0", "w-60");
+        toggleClass(parent, "w-0", "w-60");
+        
+        document.getElementById("toggle-nav-button")!.classList.toggle("is-active");
     }
-
-    sectionSetup();
+    else if (target.matches("#secondary-nav > a")) {
+        secondaryNavLoaded(target.getAttribute("href")!);
+    }
 }
 
-
+sectionSetup();

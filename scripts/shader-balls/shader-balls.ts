@@ -53,10 +53,11 @@ class FloatMatrix {
         for (let a_row = 0; a_row < this.m; a_row++) {
             for (let b_col = 0; b_col < matrix_b.n; b_col++) {
                 let product_sum = 0;
-                for (let a_col = 0; a_col < this.n; a_col++) {
-                    for (let b_row = 0; b_row < matrix_b.m; b_row++) {
-                        product_sum += this.buffer[a_row * this.n + a_col] * matrix_b.buffer[b_row * matrix_b.n + b_col];
-                    }
+                let count = 0;
+                while (count < this.n){
+                    product_sum += this.buffer[a_row * this.n + count] * matrix_b.buffer[count * matrix_b.n + b_col];
+                    console.log(`product_sum: ${product_sum}, a_row: ${a_row}, b_col: ${b_col}, count: ${count}`);
+                    count += 1;
                 }
                 dot_product.buffer[a_row * dot_product.n + b_col] = product_sum;
             }

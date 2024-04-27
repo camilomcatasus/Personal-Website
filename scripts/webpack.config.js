@@ -4,7 +4,8 @@ module.exports = {
   mode: 'development',
   entry: {
         main:'./main/main.ts',
-        htmx_snake:'./htmx_snake/htmx_snake.ts',
+        "htmx-snake":'./htmx-snake/htmx-snake.ts',
+        "shader-balls": './shader-balls/shader-balls.ts'
   },
   devtool: 'inline-source-map',
   module: {

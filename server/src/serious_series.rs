@@ -19,5 +19,5 @@ struct Project <'a> {
 #[get("/serious-series")]
 async fn main(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
     let projects: Vec<Project> = repeat(Project{ source: "https://picsum.photos/200"}).take(8).collect();
-    render_boosted(&app_state, &req, "serious_series", context! {projects => projects})
+    render_boosted(&app_state, &req, "serious-series", context! {projects => projects})
 }
