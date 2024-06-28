@@ -39,6 +39,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(state.clone())
             .service(fs::Files::new("/static", "./static").show_files_listing())
+            .service(favicon)
             .service(health_check)
             .configure(fun_nonsense::config)
             .configure(hello_world::config)
@@ -53,6 +54,12 @@ async fn main() -> std::io::Result<()> {
 #[get("/healthcheck")]
 pub async fn health_check() -> HttpResponse {
     return HttpResponse::Ok().finish();
+}
+
+#[get("/favicon.ico")]
+pub async fn favicon() -> actix_web::Result<HttpResponse, actix_web::Error> {
+    let image_content = web::block(|| std::fs::read("./static/favicon.png")).await??;
+    return Ok(HttpResponse::Ok().content_type("image/png").body(image_content))
 }
 
 pub fn render_boosted(app_state: &web::Data<AppState>, req: &HttpRequest, dir_path: &str, ctx: Value) -> HttpResponse {
