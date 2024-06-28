@@ -39,14 +39,20 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(state.clone())
             .service(fs::Files::new("/static", "./static").show_files_listing())
+            .service(health_check)
             .configure(fun_nonsense::config)
             .configure(hello_world::config)
             .configure(serious_series::config)
             .service(page)
     })
-    .bind(("127.0.0.1", server_port))?
+    .bind(("0.0.0.0", server_port))?
     .run()
     .await
+}
+
+#[get("/healthcheck")]
+pub async fn health_check() -> HttpResponse {
+    return HttpResponse::Ok().finish();
 }
 
 pub fn render_boosted(app_state: &web::Data<AppState>, req: &HttpRequest, dir_path: &str, ctx: Value) -> HttpResponse {
