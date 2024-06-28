@@ -1,0 +1,51 @@
+{% extends "fun-nonsense/section-master.html" %}
+{% block section_content %}
+<h1>
+    Fun with Shaders
+</h1>
+<p class="indent-2">
+    As someone who has an interest in game design I felt the need to get started practicing with shaders. 
+    After watching <a href="https://www.youtube.com/watch?v=9dr-tRQzij4">all</a> <a href="https://www.youtube.com/watch?v=ryB8hT5TMSg">of</a> <a href="https://www.youtube.com/watch?v=yPfagLeUa7k">Acerola's</a> content,
+    I tried using the WebGL2 api to implement the various shaders and techniques Acerola does in his video.
+    As it turns out the WebGL2 doesn't let you just upload meshes and go at it, you basically have to provide all the data including normals and transforms and only then can you start messing with the shaders. 
+    Transforms aren't applied to a mesh directly WebGL2 either (which makes sense because it's not a game engine), you have to apply the transform to all the vertex data in the shader.
+    So, while I am continuing to work on a rendering engine in javascript, I have decided that I should probably just use Godot to start messing with shaders for now. First on the list of things I want to try is shell texturing. 
+</p>
+<h2>
+    Shell Texturing in Godot
+</h2>
+<p>
+    If you want a good explanation about shell texturing and how step by step details on how to implement it, I suggest watching the <a href="https://www.youtube.com/watch?v=9dr-tRQzij4">Accerola video</a>, 
+    I just kind of want to show off the code and go through some of the issues I had while implementing shell texturing.
+    To begin with I kind of implemented Acerola's code as closely as I could within Godot, afterwards I tried to go through the video and implement everything without referencing 
+    the code he provided. For the purposes of this page, I'll be talking about my second implementation making shell textured grass.
+</p>
+<figure>
+    <img src="/static/projects/fun-nonsense/fun-with-shaders/shell-grass.png" alt="Shell Textured Grass"/>
+    <figcaption>Final Shell Textured Grass</figcaption>
+</figure>
+<h3>
+    Issues
+</h3>
+<p>
+    <b>Hash functions</b><br/>
+    I don't know why I had so much trouble finding and ensuring my hash function was correct, typing "how to make hash function" into google doesn't really produce good results, 
+    going back to the video and finding out I was supposed to look on <a href="shadertoy.com/results?query=hash">shadertoy</a> helped a bunch. After a little looking around I 
+    ended up choosing <a href="https://www.shadertoy.com/view/4djSRW">this hash without sine function</a> by Dave Hoskins. This hash function differs from the one Accerola chose,
+    it uses floats instead of integers, so I could just pass the UV data directly to the function, but this would result in every pixel having some sort of semi-random height and 
+    making it near impossible to distinguish individual blades of grass while also not being that random.
+    <img src="/static/projects/fun-nonsense/fun-with-shaders/shell-grass-uv-only-hash.png" alt="Malformed Shell Textured Grass"/>
+    As you can see, passing the UV's in to the hash function results in a sort of distinguishable pattern with no distinguishable blades of grass. So, I also had to end up passing the floor of the UV values multiplied by a density parameter.
+    The most trouble I had was writing the conditional discard statement correctly. I just couldn't wrap my head around the math (probably because of a lack of sleep) despite the math being so simple.
+</p>
+<div class="not-prose">
+<script src="https://gists.camilomcatasus.dev/cambucha/8bb348a4f9b546aca7925e1d5b34c230.js"></script>
+</div>
+<p>
+    Basically, you take the fractional value returned from the hash function and compare it to the current shell height. If the fractional value is less than the shell height, discard it. 
+    This is exactly what Acerola did in his video, again, I don't know what was wrong with me that day. I will say though, after messing with the statement for a bit, I just started reasoning out loud and worked through the problem. 
+    Goes to show that sometimes you need to take some time to really think through what you're doing, not everything can be done on autopilot.
+    <br/>
+    <b>Shell Spacing
+</p>
+{% endblock %}

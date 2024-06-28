@@ -1,7 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-	darkMode: 'class',
-	content: ["./server/src/**/*.rs", "./pages/**/*.html", "./scripts/**/*.js"],
+  darkMode: 'class',
+  content: [
+        "./server/src/**/*.rs", 
+        "./pages/**/*.html", 
+        "./scripts/**/*.js", 
+        "./static/**/*.{html,js}",
+    ],
   theme: {
       extend: {
         colors: {
@@ -15,6 +20,8 @@ module.exports = {
 		},
       },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }
 

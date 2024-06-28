@@ -1,10 +1,9 @@
 use std::sync::Mutex;
-use std::cell::RefCell;
 use std::collections::HashMap;
 use minijinja::value::Value;
 use enum_macros::EnumArray;
 use std::time::{Duration, Instant};
-use actix_web::{HttpRequest, HttpResponse, http::header::ContentType};
+use actix_web::{HttpResponse, http::header::ContentType};
 use serde::{Serialize, Deserialize};
 
 pub struct AppState {

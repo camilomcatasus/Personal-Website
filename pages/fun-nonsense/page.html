@@ -10,6 +10,8 @@
         <!--<input id="nav-search" type="text" />-->
         {% for route in routes %}
         <a href="{{route.path}}" class="px-4 w-60">{{route.text}}</a>
+            {% for sub_routes in route.routes %}
+            {% endfor %}
         {% endfor %}
     </div>
     <div class="flex absolute bottom-4 -right-12 justify-center items-center w-12 h-12 rounded-r-xl sm:hidden dark:text-white drop-shadow-md dark:bg-slate-700">
