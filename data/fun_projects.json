@@ -1,7 +1,0 @@
-[
-    {
-        "image_url": "",
-        "title": "HTMX Snake",
-        "description": "This is snake built with htmx, actix and mini_jinja"
-    }
-]
