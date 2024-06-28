@@ -25,6 +25,8 @@ async fn page() -> HttpResponse {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
+    let server_port_string = std::env::var("SERVER_PORT").unwrap_or("8000".to_string());
+    let server_port = u16::from_str_radix(&server_port_string, 10).unwrap_or(8000);
     let mut env = Environment::new();
     env.set_loader(path_loader("pages"));
 
@@ -42,7 +44,7 @@ async fn main() -> std::io::Result<()> {
             .configure(serious_series::config)
             .service(page)
     })
-    .bind(("127.0.0.1", 8081))?
+    .bind(("127.0.0.1", server_port))?
     .run()
     .await
 }
@@ -53,6 +55,7 @@ pub fn render_boosted(app_state: &web::Data<AppState>, req: &HttpRequest, dir_pa
         Some(_) => format!("{}/body.html", dir_path),
         None => format!("{}/page.html", dir_path),
     };
+
 
     app_state.render_template(&correct_path, context! { ..ctx, ..context!{boosted => boosted} })
 }
