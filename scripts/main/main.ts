@@ -1,3 +1,5 @@
+let nav_toggle_button = document.getElementById("toggle-second-nav-button")
+
 function toggleClass(elem: HTMLElement, class1: string, class2: string) {
     if (elem.classList.contains(class1))
     {
@@ -8,6 +10,16 @@ function toggleClass(elem: HTMLElement, class1: string, class2: string) {
     {
         elem.classList.add(class1);
         elem.classList.remove(class2);
+    }
+}
+
+function primaryNavLoaded() {
+    let secondary_nav = document.getElementById("secondary-nav");
+    if (secondary_nav != null) {
+        nav_toggle_button.classList.remove("hidden");
+    }
+    else {
+        nav_toggle_button.classList.add("hidden");
     }
 }
 
@@ -35,18 +47,26 @@ function sectionSetup() {
 
 }
 
+nav_toggle_button.onclick = (event: Event) => {
+    let secondaryNav = document.getElementById("secondary-nav") as HTMLElement;
+    let parent = secondaryNav.parentElement as HTMLElement;
+    toggleClass(secondaryNav, "w-0", "w-60");
+    toggleClass(parent, "w-0", "w-60");
+    
+    document.getElementById("toggle-second-nav-button").classList.toggle("is-active");
+}
+
+document.addEventListener("htmx:afterSettle", (event: Event) => {
+    primaryNavLoaded()
+})
+
 document.onclick = (event: Event) => {
     let target = event.target as HTMLElement;
-    if (target.matches(":is(#toggle-nav-button, #toggle-nav-button *)")) {
-        let secondaryNav = document.getElementById("secondary-nav") as HTMLElement;
-        let parent = secondaryNav.parentElement as HTMLElement;
-        toggleClass(secondaryNav, "w-0", "w-60");
-        toggleClass(parent, "w-0", "w-60");
-        
-        document.getElementById("toggle-nav-button")!.classList.toggle("is-active");
-    }
-    else if (target.matches("#secondary-nav > a")) {
+    if (target.matches("#secondary-nav > a")) {
         secondaryNavLoaded(target.getAttribute("href")!);
+    }
+    else if (target.matches("#primary-nav > a")) {
+
     }
 }
 

@@ -1,22 +1,31 @@
 <html class="dark" >
-<head>
-	<title>{% block title %}{% endblock %}</title>
-    <link href="/static/hamburgers.min.css" rel="stylesheet" type="text/css" />
-	<link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
-    <script src="/static/htmx.min.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
-</head>
-<body class="flex flex-col relative w-screen h-screen bg-white transition-colors drop-shadow dark:bg-slate-900 overflow-hidden">
-    <div class="flex h-12 w-full shrink-0 grow-0 dark:bg-slate-950 text-white px-4 items-center gap-3"
-        hx-target="#section-boost-container">
-        <a href="/hello-world">Hello World?</a>
-        <a href="/fun-nonsense">Fun Nonsense</a>
-        <a href="/serious-series">Serious Series</a>
-    </div>
-    <div id="section-boost-container" class="flex grow h-0 w-full relative">
-    {% block main_section %}
-    {% endblock %}
-    </div>
-    <script src="/static/main.js"></script>
-</body>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link href="/static/hamburgers.min.css" rel="stylesheet" type="text/css" />
+        <link href="/static/tailwind.css" rel="stylesheet" type="text/css" />
+        <script src="https://unpkg.com/htmx.org@2.0.0"></script>
+        <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"></script>
+        <script src="https://unpkg.com/htmx.org/dist/ext/debug.js"></script>
+    </head>
+    <body class="w-screen h-screen">
+        <div class="flex flex-col relative w-full h-full bg-white transition-colors drop-shadow dark:bg-slate-900 overflow-hidden">
+            <div id="primary-nav" 
+                class="flex w-full shrink-0 grow-0 dark:bg-slate-950 text-white px-2 py-2 items-center gap-2 text-xl"
+                hx-target="#section-boost-container" hx-boost="true">
+                <button id="toggle-second-nav-button" class="hamburger hamburger--arrow scale-[0.6] lg:hidden" type="button">
+                    <span class="hamburger-box">
+                        <span class="dark:bg-white hamburger-inner"></span>
+                    </span>
+                </button>
+                <a class="transition-colors bg-slate-950 duration-200 hover:bg-cyan-950 rounded p-2" href="/hello-world">Hello World?</a>
+                <a class="transition-colors bg-slate-950 duration-200 hover:bg-cyan-950 rounded p-2" href="/fun-nonsense">Fun Nonsense</a>
+                <a class="transition-colors bg-slate-950 duration-200 hover:bg-cyan-950 rounded p-2" href="/serious-series">Serious Series</a>
+            </div>
+            <div id="section-boost-container" class="flex grow h-0 w-full relative">
+            {% block main_section %}
+            {% endblock %}
+            </div>
+        </div>
+        <script src="/static/main.js"></script>
+    </body>
+</html>

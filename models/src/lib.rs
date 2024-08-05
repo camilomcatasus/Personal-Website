@@ -42,3 +42,24 @@ pub struct ResponseObject {
     pub help_text: Option<String>,
     pub url: String
 }
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Route {
+    pub path: &'static str,
+    pub text: &'static str,
+    pub simple: bool,
+    pub title: &'static str,
+    pub sub_routes: Vec<Route>,
+}
+
+impl Route {
+    pub fn new(path: &'static str, text: &'static str, simple: bool, title: &'static str) -> Self {
+        Route {
+            path,
+            text,
+            simple,
+            title,
+            sub_routes: Vec::new(),
+        }
+    }
+}

@@ -1,0 +1,13 @@
+{% if not boosted %}
+    {% extends "true-base.html" %}
+    {% block title %}Is anyone there?{% endblock %}
+{% else %}
+<title>Is anyone there?</title>
+{% endif %}
+{% block main_section %}
+<div id="console-container" class="w-full h-full p-8 overflow-hidden">
+    <canvas id="console" class=""></canvas>
+    <script></script>
+<wiki:gadget url="http://shellinabox.googlecode.com/git/demo/demo.xml" width="720" height="500" border="1" />
+</div>
+{% endblock %}

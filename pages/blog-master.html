@@ -1,0 +1,26 @@
+{% if not boosted %}
+{% extends "true-base.html" %}
+{% block title %}{% endblock %}
+{% endif %}
+{% block main_section %}
+<div class="absolute w-0 h-full lg:relative lg:w-60 transition-[width] shrink-0 grow-0 top-0 bottom-0">
+    <div 
+        id="secondary-nav" 
+        class="flex overflow-x-hidden flex-col gap-2 py-4 w-0 h-full lg:w-60 dark:text-white transition-[width] drop-shadow-md lg:dark:bg-slate-900 dark:bg-slate-850 text-lg" 
+        hx-boost="true"
+        hx-target="#boost-container">
+        <!--<input id="nav-search" type="text" />-->
+        {% for route in routes %}
+        <a href="{{route.path}}" class="px-4 w-60">{{route.text}}</a>
+            {% for sub_routes in route.routes %}
+            {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+<div  class="flex flex-col overflow-y-auto w-full h-full grow justify-between">
+    <div id="boost-container" class="flex flex-col w-full grow">
+    {% block content %}
+    {% endblock %}
+    </div>
+</div>
+{% endblock %}

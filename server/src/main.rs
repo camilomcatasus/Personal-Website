@@ -39,6 +39,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(state.clone())
             .service(fs::Files::new("/static", "./static").show_files_listing())
+            .service(fs::Files::new("/static-modules", "./node_modules").show_files_listing())
             .service(favicon)
             .service(health_check)
             .configure(fun_nonsense::config)

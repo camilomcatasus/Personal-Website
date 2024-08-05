@@ -1,0 +1,9 @@
+{% if not boosted %}
+    {% extends "true-base.html" %}
+    {% block title %}Is anyone there?{% endblock %}
+{% else %}
+<title>Is anyone there?</title>
+{% endif %}
+{% block main_section %}
+{% include "hello-world/body.html" %}
+{% endblock %}

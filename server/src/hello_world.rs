@@ -13,7 +13,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 
 #[get("/hello-world")]
 async fn hello_world(app_state: web::Data<AppState>, req: HttpRequest) -> HttpResponse {
-    return crate::render_boosted(&app_state, &req, "hello_world", context! {});
+    return crate::render_boosted(&app_state, &req, "hello-world", context! {});
 }
 
 #[derive(Serialize, Deserialize)]
